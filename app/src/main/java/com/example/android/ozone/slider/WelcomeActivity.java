@@ -1,4 +1,4 @@
-package com.example.android.ozone.into_slider;
+package com.example.android.ozone.slider;
 
 import android.content.Context;
 import android.content.Intent;
@@ -120,7 +120,7 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     private void launchHomeScreen() {
-        prefManager.setFirstTimeLaunch(true);
+        prefManager.setFirstTimeLaunch(false);
         startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
         finish();
     }

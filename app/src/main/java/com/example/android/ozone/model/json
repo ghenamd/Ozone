@@ -1,0 +1,34 @@
+
+{
+  "status":"success",
+  "data":{
+    "city":"Waynesburg",
+    "state":"Pennsylvania",
+    "country":"USA",
+    "location":{
+      "type":"Point",
+      "coordinates":[
+        -80.2897,
+        39.82
+      ]
+    },
+    "current":{
+      "weather":{
+        "ts":"2018-06-11T03:00:00.000Z",
+        "hu":93,
+        "ic":"50n",
+        "pr":1013,
+        "tp":19,
+        "wd":211,
+        "ws":0.92
+      },
+      "pollution":{
+        "ts":"2018-06-12T11:00:00.000Z",
+        "aqius":26,
+        "mainus":"o3",
+        "aqicn":21,
+        "maincn":"o3"
+      }
+    }
+  }
+}

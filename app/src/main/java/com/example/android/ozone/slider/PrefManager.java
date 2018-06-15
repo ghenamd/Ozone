@@ -1,4 +1,4 @@
-package com.example.android.ozone.into_slider;
+package com.example.android.ozone.slider;
 
 import android.content.Context;
 import android.content.SharedPreferences;
