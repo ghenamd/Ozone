@@ -20,6 +20,9 @@
     <color name="dot_light_screen2">#93c6fd</color>
     <color name="dot_light_screen3">#e4b5fc</color>
 
+    <color name="card1">#88f5e7</color>
+    <color name="gray">#9f9c9c</color>
+
     <array name="array_dot_active">
         <item>@color/dot_light_screen1</item>
         <item>@color/dot_light_screen2</item>

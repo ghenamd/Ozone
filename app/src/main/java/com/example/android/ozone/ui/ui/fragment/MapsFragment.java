@@ -1,4 +1,4 @@
-package com.example.android.ozone.ui.fragments;
+package com.example.android.ozone.ui.ui.fragment;
 
 
 import android.os.Bundle;
@@ -9,13 +9,10 @@ import android.view.ViewGroup;
 
 import com.example.android.ozone.R;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class FavouriteFragment extends Fragment {
+public class MapsFragment extends Fragment {
 
 
-    public FavouriteFragment() {
+    public MapsFragment() {
         // Required empty public constructor
     }
 
@@ -24,7 +21,7 @@ public class FavouriteFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favourite, container, false);
+        return inflater.inflate(R.layout.fragment_maps, container, false);
     }
 
 }

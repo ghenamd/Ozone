@@ -1,29 +1,40 @@
-package com.example.android.ozone.ui.fragments;
+package com.example.android.ozone.ui.ui.fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.databinding.DataBindingUtil;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.ozone.R;
-import com.example.android.ozone.constants.OzoneConstants;
-import com.example.android.ozone.databinding.FragmentLocationBinding;
+import com.example.android.ozone.ViewModel.MainViewModel;
+import com.example.android.ozone.data.AppDatabase;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.network.AQIntentService;
+import com.example.android.ozone.ui.ui.adapter.LocationAdapter;
+import com.example.android.ozone.utils.AppExecutors;
+import com.example.android.ozone.utils.OzoneConstants;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -35,32 +46,53 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 public class LocationFragment extends Fragment {
 
-    private static final String TAG = "LocationFragment";
     private double lat;
     private double lon;
+    private AppDatabase mDb;
     private JsonData mData = new JsonData();
-    private FragmentLocationBinding mBinding;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private LocationAdapter mAdapter;
+    @BindView(R.id.progressBar)
+    ProgressBar mProgressBar;
+    @BindView(R.id.recycler_location)
+    RecyclerView mRecyclerView;
+    @BindView(R.id.internet_connection)
+    TextView noInternet;
+    private LinearLayoutManager manager;
 
     public LocationFragment() {
         // Required empty public constructor
     }
 
-    private FusedLocationProviderClient mFusedLocationClient;
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = DataBindingUtil.inflate(inflater,R.layout.fragment_location, container, false);
-        initPermissions();
-        mBinding.aqius.setText(String.valueOf(mData.getAqius()));
-
-
-        return mBinding.getRoot();
+        View view = inflater.inflate(R.layout.fragment_location, container, false);
+        manager = new LinearLayoutManager(getActivity().getBaseContext());
+        ButterKnife.bind(this, view);
+        mAdapter = new LocationAdapter();
+        mDb = AppDatabase.getInstance(getActivity());
+        if (isConnected()) {
+            mProgressBar.setVisibility(View.VISIBLE);
+            initPermissions();
+            setupViewModel();
+        } else if(!isConnected()) {
+            noInternet.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.INVISIBLE);
+        }
+        return view;
     }
 
     //Request user permission to get the last location
@@ -130,20 +162,68 @@ public class LocationFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
     }
 
+    //A BroadcastReceiver is used to get the JsonData object from the AQIntentService
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             int resultCode = intent.getIntExtra("resultCode", RESULT_CANCELED);
             if (resultCode == RESULT_OK) {
-                mData = intent.getParcelableExtra("data");
+                synchronized (getActivity()) {
+                    mData = intent.getParcelableExtra("data");
+                    populateUi(mData);
+                    insertLocation(mData);
 
-                Log.d(TAG, String.valueOf(mData.getAqius()));
-
+                }
             }
         }
     };
-    private void updateUI(){
 
+    //Helper method to check if there is Internet connection
+    private boolean isConnected() {
+        ConnectivityManager manager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = Objects.requireNonNull(manager).getActiveNetworkInfo();
+        return info != null && info.isConnectedOrConnecting();
     }
 
+    //Helper method to insert current location into database
+    private void insertLocation(final JsonData data) {
+
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.locationDao().insertLocation(data);
+
+            }
+
+        });
+    }
+
+    //Helper method to populate the UI
+    private void populateUi(JsonData jsonData) {
+        List<JsonData> mDataList = new ArrayList<>();
+        mDataList.add(jsonData);
+        LinearLayoutManager manager = new LinearLayoutManager(getActivity().getBaseContext());
+        mAdapter.addData(mDataList);
+        mRecyclerView.setLayoutManager(manager);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setNestedScrollingEnabled(true);
+        mRecyclerView.setAdapter(mAdapter);
+        mProgressBar.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * If there is no internet connection we can use a ViewModel to retrieve
+     * the last location from the database and populate the UI
+     */
+    private void setupViewModel() {
+        MainViewModel viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        viewModel.getLocation().observe(this, new Observer<List<JsonData>>() {
+            @Override
+            public void onChanged(@Nullable List<JsonData> jsonData) {
+                if ((jsonData !=null )) {
+
+                }
+            }
+        });
+    }
 }

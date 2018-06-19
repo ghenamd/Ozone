@@ -16,9 +16,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    dataBinding {
-        enabled = true
-    }
 }
 
 dependencies {
@@ -26,12 +23,18 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 
+    implementation "android.arch.persistence.room:runtime:1.1.0"
+    annotationProcessor "android.arch.persistence.room:compiler:1.1.0"
     implementation "com.android.support:design:27.1.1"
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.google.android.gms:play-services-location:15.0.1'
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+    annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
     // dexter runtime permissions
     implementation 'com.karumi:dexter:4.2.0'
     implementation 'com.android.support:cardview-v7:27.1.1'

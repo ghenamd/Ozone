@@ -1,12 +1,26 @@
 package com.example.android.ozone.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class JsonData implements Parcelable{
+@Entity(tableName = "location")
+public class JsonData implements Parcelable {
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @PrimaryKey(autoGenerate = true)
+    private int id;
     @SerializedName("city")
     @Expose
     private String city;
@@ -55,11 +69,30 @@ public class JsonData implements Parcelable{
     @Expose
     private int aqicn;
 
+    @Ignore
     public JsonData() {
     }
 
+    @Ignore
     public JsonData(String city, String state, String country, String ts, int hu,
                     String ic, int pr, int tp, int wd, double ws, int aqius, int aqicn) {
+        this.city = city;
+        this.state = state;
+        this.country = country;
+        this.ts = ts;
+        this.hu = hu;
+        this.ic = ic;
+        this.pr = pr;
+        this.tp = tp;
+        this.wd = wd;
+        this.ws = ws;
+        this.aqius = aqius;
+        this.aqicn = aqicn;
+    }
+
+    public JsonData(int id, String city, String state, String country, String ts,
+                    int hu, String ic, int pr, int tp, int wd, double ws, int aqius, int aqicn) {
+        this.id = id;
         this.city = city;
         this.state = state;
         this.country = country;

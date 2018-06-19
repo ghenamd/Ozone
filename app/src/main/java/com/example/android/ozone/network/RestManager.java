@@ -1,6 +1,6 @@
 package com.example.android.ozone.network;
 
-import com.example.android.ozone.constants.OzoneConstants;
+import com.example.android.ozone.utils.OzoneConstants;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

@@ -8,9 +8,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.example.android.ozone.ui.fragments.FavouriteFragment;
-import com.example.android.ozone.ui.fragments.LocationFragment;
-import com.example.android.ozone.ui.fragments.MapsFragment;
+import com.example.android.ozone.ui.ui.fragment.FavouriteFragment;
+import com.example.android.ozone.ui.ui.fragment.LocationFragment;
+import com.example.android.ozone.ui.ui.fragment.MapsFragment;
 
 public class MainActivity extends AppCompatActivity {
     private ActionBar mActionBar;
@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         LocationFragment locationFragment = new LocationFragment();
         transaction.add(R.id.main_container,locationFragment);
+        transaction.addToBackStack(null);
         transaction.commit();
         BottomNavigationView navigationView = findViewById(R.id.navigation);
         navigationView.setOnNavigationItemSelectedListener(mBottomNavigationView);

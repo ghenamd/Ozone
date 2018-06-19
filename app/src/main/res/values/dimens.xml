@@ -12,4 +12,6 @@
     <dimen name="desc_padding">40dp</dimen>
     <dimen name="roboto_reg_24">24sp</dimen>
     <dimen name="roboto_reg_10">10sp</dimen>
+    <dimen name="roboto_14">14sp</dimen>
+    <dimen name="icon_width">35dp</dimen>
 </resources>
