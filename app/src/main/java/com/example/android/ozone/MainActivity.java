@@ -8,9 +8,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.example.android.ozone.ui.ui.fragment.FavouriteFragment;
-import com.example.android.ozone.ui.ui.fragment.LocationFragment;
-import com.example.android.ozone.ui.ui.fragment.MapsFragment;
+import com.example.android.ozone.ui.view.fragment.FavouriteFragment;
+import com.example.android.ozone.ui.view.fragment.LocationFragment;
+import com.example.android.ozone.ui.view.fragment.MapsFragment;
 
 public class MainActivity extends AppCompatActivity {
     private ActionBar mActionBar;

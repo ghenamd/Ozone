@@ -28,7 +28,15 @@
     <string name="unhealthy">Unhealthy</string>
     <string name="very_unhealthy">Very Unhealthy</string>
     <string name="hazardous">Hazardous</string>
-    <string name="please_check_your_intenet_connection">Please check your intenet connection</string>
+    <string name="please_check_your_intenet_connection">Please check internet connection</string>
+    <string name="enter_a_place_name_or_address">Enter a place name or address</string>
+    <string name="source_www_airvisual_com">Source: www.airvisual.com</string>
+    <string name="desc_good">Air quality is considered satisfactory, and air pollution poses little or no risk.</string>
+    <string name="desc_moderate">Air quality is acceptable; however, for some pollutants there may be a moderate health concern for a very small number of people who are unusually sensitive to air pollution.</string>
+    <string name="desc_unhealthy">Everyone may begin to experience health effects; members of sensitive groups may experience more serious health effects.</string>
+    <string name="desc_ver_unhealthy">Health alert: everyone may experience more serious health effects.</string>
+    <string name="desc_hazardous">Health warnings of emergency conditions. The entire population is more likely to be affected.</string>
+
 
 
 </resources>

@@ -11,14 +11,19 @@ import com.example.android.ozone.model.JsonData;
 import java.util.List;
 
 public class MainViewModel extends AndroidViewModel {
+
     private LiveData<List<JsonData>> location;
+
     public MainViewModel(@NonNull Application application) {
         super(application);
         AppDatabase appDatabase = AppDatabase.getInstance(this.getApplication());
         location = appDatabase.locationDao().getAllLocations();
+
     }
 
     public LiveData<List<JsonData>> getLocation() {
         return location;
     }
+
+
 }

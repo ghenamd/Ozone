@@ -1,14 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.ui.fragment.MapsFragment">
+    tools:context=".ui.view.fragment.MapsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        tools:context=".ui.view.fragment.MapsFragment"/>
+    <RelativeLayout
+        android:id="@+id/map_search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/white_border"
+        android:elevation="6dp">
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/ic_magnify"
+            android:layout_marginLeft="8dp"
+            android:id="@+id/magnify"
+            android:layout_centerVertical="true"
+            />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/magnify"
+            android:layout_centerVertical="true"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:textSize="16sp"
+            android:textColor="@color/gray"
+            android:id="@+id/text_search_bar"
+            android:background="@null"
+            android:hint="@string/enter_a_place_name_or_address"
+            android:maxLines="1"
+            android:inputType="text"
+            android:imeOptions="actionSearch"/>
 
-</FrameLayout>
+    </RelativeLayout>
+
+
+</RelativeLayout>
