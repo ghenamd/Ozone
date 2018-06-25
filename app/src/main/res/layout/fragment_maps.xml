@@ -30,7 +30,7 @@
             android:id="@+id/magnify"
             android:layout_centerVertical="true"
             />
-        <EditText
+        <AutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_toRightOf="@+id/magnify"
@@ -44,9 +44,19 @@
             android:hint="@string/enter_a_place_name_or_address"
             android:maxLines="1"
             android:inputType="text"
-            android:imeOptions="actionSearch"/>
+            android:imeOptions="actionDone"/>
 
     </RelativeLayout>
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/map_search_bar"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:id="@+id/gps_icon"
+        android:src="@drawable/ic_gps"
+        android:scaleType="centerCrop"
+        android:layout_alignParentRight="true"/>
 
 
 </RelativeLayout>

@@ -1,6 +1,7 @@
 package com.example.android.ozone.ui.view.fragment;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
@@ -21,7 +22,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,10 +37,10 @@ import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.network.AQIntentService;
 import com.example.android.ozone.ui.view.adapter.LocationAdapter;
 import com.example.android.ozone.utils.AppExecutors;
+import com.example.android.ozone.utils.OzoneConstants;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.karumi.dexter.BuildConfig;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -64,7 +64,6 @@ public class LocationFragment extends Fragment {
 
     private AppDatabase mDb;
     private JsonData mData = new JsonData();
-    //private FusedLocationProviderClient mFusedLocationClient;
     private LocationAdapter mAdapter;
     @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
@@ -74,9 +73,8 @@ public class LocationFragment extends Fragment {
     TextView noInternet;
     @BindView(R.id.relativeLayout)
     RelativeLayout mRelativeLayout;
-    private LinearLayoutManager manager;
     private FusedLocationProviderClient mFusedLocationClient;
-    private Location mLocation;
+
     public LocationFragment() {
         // Required empty public constructor
     }
@@ -86,7 +84,6 @@ public class LocationFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_location, container, false);
         mDb = AppDatabase.getInstance(getActivity());
-        manager = new LinearLayoutManager(getActivity().getBaseContext());
         ButterKnife.bind(this, view);
         mAdapter = new LocationAdapter();
         if (isConnected()) {
@@ -99,7 +96,6 @@ public class LocationFragment extends Fragment {
                     "Connection Lost", Snackbar.LENGTH_LONG);
             snackbar.show();
         }
-        deletePlace();
         return view;
     }
 
@@ -154,6 +150,12 @@ public class LocationFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 synchronized (getActivity()) {
                     mData = intent.getParcelableExtra("data");
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDb.locationDao().insertLocation(mData);
+                        }
+                    });
                     populateUi(mData);
                 }
             }
@@ -167,25 +169,28 @@ public class LocationFragment extends Fragment {
         return info != null && info.isConnectedOrConnecting();
     }
 
-    private void getLastLocation(){
+    @SuppressLint("MissingPermission")
+    private void getLastLocation() {
         mFusedLocationClient = LocationServices.
-                getFusedLocationProviderClient(getActivity());
-        try {
-            mFusedLocationClient.getLastLocation()
-                    .addOnCompleteListener(new OnCompleteListener<Location>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Location> task) {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                mLocation = task.getResult();
-                                Log.d(TAG, "onComplete: " + String.valueOf(mLocation.getLongitude()));
-                            } else {
-                                Log.w(TAG, "Failed to get location.");
-                            }
+                getFusedLocationProviderClient(getActivity().getApplicationContext());
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+                            double lat = location.getLatitude();
+                            double lon = location.getLongitude();
+                            Intent AQIntentService = new Intent(getActivity(), AQIntentService.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putDouble(OzoneConstants.LAT, lat);
+                            bundle.putDouble(OzoneConstants.LON, lon);
+                            AQIntentService.putExtra(OzoneConstants.BUNDLE, bundle);
+                            getActivity().startService(AQIntentService);
                         }
-                    });
-        } catch (SecurityException unlikely) {
-            Log.e(TAG, "Lost location permission." + unlikely);
-        }
+                    }
+                });
     }
 
     //Helper method to populate the UI
@@ -216,7 +221,8 @@ public class LocationFragment extends Fragment {
             }
         });
     }
-    private void deletePlace(){
+
+    private void deletePlace() {
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override

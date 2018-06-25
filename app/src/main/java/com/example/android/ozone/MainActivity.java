@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
                     LocationFragment locationFragment = new LocationFragment();
                     transaction.replace(R.id.main_container,locationFragment);
                     mActionBar.setTitle(R.string.location);
+                    transaction.addToBackStack(null);
                     transaction.commit();
                     return true;
                 case R.id.map:
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         mActionBar.setTitle(R.string.location);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         LocationFragment locationFragment = new LocationFragment();
-        transaction.add(R.id.main_container,locationFragment);
+        transaction.replace(R.id.main_container,locationFragment);
         transaction.addToBackStack(null);
         transaction.commit();
         BottomNavigationView navigationView = findViewById(R.id.navigation);
