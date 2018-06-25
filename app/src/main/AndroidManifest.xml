@@ -24,10 +24,13 @@
         </activity>
         <activity android:name=".MainActivity"
             android:label="@string/app_name"
+            android:hardwareAccelerated="true"
             android:theme="@style/AppTheme.NoActionBar"/>
 
         <service android:name=".network.AQIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <service android:name=".network.MapsIntentService" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBp9XW42V5Uu8bvTsYS1uymPmFsBzSRW9k" />

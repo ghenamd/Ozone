@@ -2,13 +2,17 @@ package com.example.android.ozone.ui.view.fragment;
 
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -20,23 +24,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.ozone.R;
-import com.example.android.ozone.model.PlaceInfo;
+import com.example.android.ozone.model.JsonData;
+import com.example.android.ozone.network.FetchData;
 import com.example.android.ozone.utils.PlaceAutocompleteAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.AutocompletePrediction;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -45,10 +44,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -70,7 +71,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     private static final LatLngBounds LAT_LNG_BOUNDS =
             new LatLngBounds(new LatLng(49.38, -17.39), new LatLng(59.53, 8.96));
     private GoogleApiClient mGoogleApiClient;
-    private PlaceInfo mPlace;
+    private Marker mMarker;
 
 
     public MapsFragment() {
@@ -115,7 +116,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
     private void init() {
         mCompleteTextView.setAdapter(mPlaceAutocompleteAdapter);
-        mCompleteTextView.setOnItemClickListener(mItemClickListener);
         mCompleteTextView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int action, KeyEvent keyEvent) {
@@ -174,16 +174,46 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     }
 
     //Moves Camera to the selected location
-    private void moveCamera(LatLng latLng, float zoom, String title) {
+    private void moveCamera(final LatLng latLng, float zoom, String title) {
+        if (mMarker != null) {
+            mMarker.remove();
+        }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
         MarkerOptions options = new MarkerOptions()
                 .position(latLng)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
                 .title(title);
-        mMap.addMarker(options);
+        mMarker = mMap.addMarker(options);
+
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        URL url = FetchData.createUrl(String.valueOf(mMarker.getPosition().latitude),
+                                String.valueOf(mMarker.getPosition().longitude));
+                        String reply = null;
+                        try {
+                            reply = FetchData.getResponseFromHttpUrl(url);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        JsonData jsonData = FetchData.extractFeatureFromJson(reply);
+                        createCustomDialog(jsonData);
+                    }
+                });
+                return true;
+            }
+        });
+
         //Hides the keyboard
         hideKeyboard();
     }
+
 
     //Helper method to check if there is Internet connection
     private boolean isConnected() {
@@ -199,48 +229,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         mGoogleApiClient.stopAutoManage(getActivity());
         mGoogleApiClient.disconnect();
     }
+
     /*
-    ---------------------------------------- google places API autocomplete suggestion-----------
+     ----------------------find device location using FusedLocationProviderClient------------
      */
-
-    private AdapterView.OnItemClickListener mItemClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            hideKeyboard();
-            final AutocompletePrediction item = mPlaceAutocompleteAdapter.getItem(i);
-            final String placeId = item.getPlaceId();
-            PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId);
-            placeResult.setResultCallback(mPlaceDetailsCallback);
-
-        }
-    };
-    private ResultCallback<PlaceBuffer> mPlaceDetailsCallback = new ResultCallback<PlaceBuffer>() {
-        @Override
-        public void onResult(@NonNull PlaceBuffer places) {
-            if (!places.getStatus().isSuccess()) {
-                places.release();
-                return;
-            }
-            final Place place = places.get(0);
-
-            try {
-                mPlace = new PlaceInfo();
-                mPlace.setName(place.getName().toString());
-                mPlace.setLat(place.getViewport().getCenter().latitude);
-                mPlace.setLon(place.getViewport().getCenter().longitude);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            moveCamera(new LatLng(mPlace.getLat(),
-                    mPlace.getLon()),ZOOM,mPlace.getName());
-            hideKeyboard();
-            places.release();
-        }
-
-    };
-/*
- ----------------------------- find device location using FusedLocationProviderClient
- */
     @SuppressLint("MissingPermission")
     private void getDeviceLocation() {
         mFusedLocationClient = LocationServices.
@@ -261,9 +253,40 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
                 });
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
+    /*
+     ------------- Create an AlertDialog to show AQI of the place when a marker is clicked----------------
+     */
+    public void createCustomDialog(JsonData data) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View view = inflater.inflate(R.layout.custom_dialog, null);
+        TextView aqi = view.findViewById(R.id.dialog_aqi);
+        aqi.setText(data.getAqius());
+        builder.setView(view);
+        builder.show();
     }
+
+    public class AsyncMap extends AsyncTask<Void, Void, JsonData> {
+
+        @Override
+        protected JsonData doInBackground(Void... voids) {
+            URL url = FetchData.createUrl(String.valueOf(mMarker.getPosition().latitude),
+                    String.valueOf(mMarker.getPosition().longitude));
+            String reply = null;
+            try {
+                reply = FetchData.getResponseFromHttpUrl(url);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return FetchData.extractFeatureFromJson(reply);
+        }
+
+        @Override
+        protected void onPostExecute(JsonData data) {
+            super.onPostExecute(data);
+            createCustomDialog(data);
+
+        }
+    }
+
 }

@@ -26,6 +26,7 @@ public class AQIntentService extends JobIntentService {
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
 
+
         Bundle bundle = intent.getBundleExtra(OzoneConstants.BUNDLE);
         String lat = String.valueOf(bundle.getDouble(OzoneConstants.LAT));
         String lon = String.valueOf(bundle.getDouble(OzoneConstants.LON));
