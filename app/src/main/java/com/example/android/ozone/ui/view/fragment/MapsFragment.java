@@ -2,17 +2,14 @@ package com.example.android.ozone.ui.view.fragment;
 
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,18 +21,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.ozone.R;
-import com.example.android.ozone.model.JsonData;
-import com.example.android.ozone.network.FetchData;
+import com.example.android.ozone.dialog.MarkerDialog;
+import com.example.android.ozone.model.PlaceInfo;
+import com.example.android.ozone.utils.OzoneConstants;
 import com.example.android.ozone.utils.PlaceAutocompleteAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.AutocompletePrediction;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -49,7 +53,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -72,7 +75,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             new LatLngBounds(new LatLng(49.38, -17.39), new LatLng(59.53, 8.96));
     private GoogleApiClient mGoogleApiClient;
     private Marker mMarker;
-
+    private PlaceInfo mPlace;
 
     public MapsFragment() {
         // Required empty public constructor
@@ -92,7 +95,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             ft.replace(R.id.map, mMapFragment).commit();
         }
         mMapFragment.getMapAsync(this);
-
         // Inflate the layout for this fragment
         return view;
     }
@@ -184,32 +186,18 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
                 .title(title);
         mMarker = mMap.addMarker(options);
-
-
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-
-                Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        URL url = FetchData.createUrl(String.valueOf(mMarker.getPosition().latitude),
-                                String.valueOf(mMarker.getPosition().longitude));
-                        String reply = null;
-                        try {
-                            reply = FetchData.getResponseFromHttpUrl(url);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        JsonData jsonData = FetchData.extractFeatureFromJson(reply);
-                        createCustomDialog(jsonData);
-                    }
-                });
+                Intent intent = new Intent(getActivity(), MarkerDialog.class);
+                Bundle bundle =  new Bundle();
+                bundle.putDouble(OzoneConstants.LAT_MAP, marker.getPosition().latitude);
+                bundle.putDouble(OzoneConstants.LON_MAP,marker.getPosition().longitude);
+                intent.putExtra(OzoneConstants.BUNDLE_MAP,bundle);
+                startActivity(intent);
                 return true;
             }
         });
-
         //Hides the keyboard
         hideKeyboard();
     }
@@ -252,41 +240,43 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
                     }
                 });
     }
-
     /*
-     ------------- Create an AlertDialog to show AQI of the place when a marker is clicked----------------
+    ---------------------------- google places API autocomplete suggestion-----------
      */
-    public void createCustomDialog(JsonData data) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.custom_dialog, null);
-        TextView aqi = view.findViewById(R.id.dialog_aqi);
-        aqi.setText(data.getAqius());
-        builder.setView(view);
-        builder.show();
-    }
 
-    public class AsyncMap extends AsyncTask<Void, Void, JsonData> {
-
+    private AdapterView.OnItemClickListener mItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
-        protected JsonData doInBackground(Void... voids) {
-            URL url = FetchData.createUrl(String.valueOf(mMarker.getPosition().latitude),
-                    String.valueOf(mMarker.getPosition().longitude));
-            String reply = null;
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            hideKeyboard();
+            final AutocompletePrediction item = mPlaceAutocompleteAdapter.getItem(i);
+            final String placeId = item.getPlaceId();
+            PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId);
+            placeResult.setResultCallback(mPlaceDetailsCallback);
+
+        }
+    };
+    private ResultCallback<PlaceBuffer> mPlaceDetailsCallback = new ResultCallback<PlaceBuffer>() {
+        @Override
+        public void onResult(@NonNull PlaceBuffer places) {
+            if (!places.getStatus().isSuccess()) {
+                places.release();
+                return;
+            }
+            final Place place = places.get(0);
+
             try {
-                reply = FetchData.getResponseFromHttpUrl(url);
-            } catch (IOException e) {
+                mPlace = new PlaceInfo();
+                mPlace.setName(place.getName().toString());
+                mPlace.setLat(place.getViewport().getCenter().latitude);
+                mPlace.setLon(place.getViewport().getCenter().longitude);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-            return FetchData.extractFeatureFromJson(reply);
+            moveCamera(new LatLng(mPlace.getLat(),
+                    mPlace.getLon()), ZOOM, mPlace.getName());
+            hideKeyboard();
+            places.release();
         }
 
-        @Override
-        protected void onPostExecute(JsonData data) {
-            super.onPostExecute(data);
-            createCustomDialog(data);
-
-        }
-    }
-
+    };
 }

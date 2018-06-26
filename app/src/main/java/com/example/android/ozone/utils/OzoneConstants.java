@@ -9,6 +9,8 @@ public class OzoneConstants {
     public static final String LAT = "Lat";
     public static final String LON = "Lon";
     public static final String BUNDLE = "Bundle";
-
+    public static final String BUNDLE_MAP = "Bundle_Map";
+    public static final String LAT_MAP = "lat_map";
+    public static final String LON_MAP = "lon_map";
 
 }
