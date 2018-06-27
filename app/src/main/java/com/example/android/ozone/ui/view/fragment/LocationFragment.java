@@ -21,8 +21,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -36,7 +38,6 @@ import com.example.android.ozone.data.AppDatabase;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.network.AQIntentService;
 import com.example.android.ozone.ui.view.adapter.LocationAdapter;
-import com.example.android.ozone.utils.AppExecutors;
 import com.example.android.ozone.utils.OzoneConstants;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -60,7 +61,6 @@ import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 public class LocationFragment extends Fragment {
-    private static final String TAG = "LocationFragment";
 
     private AppDatabase mDb;
     private JsonData mData = new JsonData();
@@ -73,31 +73,59 @@ public class LocationFragment extends Fragment {
     TextView noInternet;
     @BindView(R.id.relativeLayout)
     RelativeLayout mRelativeLayout;
+    //    @BindView(R.id.location_fav)
+//    ImageButton mButton;
     private FusedLocationProviderClient mFusedLocationClient;
+    private boolean databaseIsNotEmpty;
 
     public LocationFragment() {
         // Required empty public constructor
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_app_bar,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id){
+            case R.id.app_bar_favourite:
+
+                return true;
+            case R.id.app_bar_settings:
+
+                return true;
+            default:
+                break;
+        }
+        return false;
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_location, container, false);
-        mDb = AppDatabase.getInstance(getActivity());
         ButterKnife.bind(this, view);
+        mDb = AppDatabase.getInstance(getActivity());
         mAdapter = new LocationAdapter();
         if (isConnected()) {
             mProgressBar.setVisibility(View.VISIBLE);
             initPermissions();
         } else if (!isConnected()) {
-            noInternet.setVisibility(View.VISIBLE);
-            mProgressBar.setVisibility(View.INVISIBLE);
-            Snackbar snackbar = Snackbar.make(getActivity().findViewById(android.R.id.content),
-                    "Connection Lost", Snackbar.LENGTH_LONG);
-            snackbar.show();
+            checkIfAppdatabaseIsEmpty();
         }
         return view;
     }
+
 
     //Request user permission to get the last location
     private void initPermissions() {
@@ -111,7 +139,7 @@ public class LocationFragment extends Fragment {
 
                     @Override
                     public void onPermissionDenied(PermissionDeniedResponse response) {
-                        Toast.makeText(getActivity(), "Permession Deny", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Permission Deny", Toast.LENGTH_SHORT).show();
                         if (response.isPermanentlyDenied()) {
                             // navigate to app settings
                             Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
@@ -128,20 +156,6 @@ public class LocationFragment extends Fragment {
                 }).check();
     }
 
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        IntentFilter filter = new IntentFilter(AQIntentService.ACTION);
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
-    }
-
     //A BroadcastReceiver is used to get the JsonData object from the AQIntentService
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -150,24 +164,13 @@ public class LocationFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 synchronized (getActivity()) {
                     mData = intent.getParcelableExtra("data");
-                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            mDb.locationDao().insertLocation(mData);
-                        }
-                    });
-                    populateUi(mData);
+                    List<JsonData> list = new ArrayList<>();
+                    list.add(mData);
+                    populateUi(list);
                 }
             }
         }
     };
-
-    //Helper method to check if there is Internet connection
-    private boolean isConnected() {
-        ConnectivityManager manager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = Objects.requireNonNull(manager).getActiveNetworkInfo();
-        return info != null && info.isConnectedOrConnecting();
-    }
 
     @SuppressLint("MissingPermission")
     private void getLastLocation() {
@@ -193,12 +196,62 @@ public class LocationFragment extends Fragment {
                 });
     }
 
+    /**
+     * If there is no internet connection we can use a ViewModel to retrieve
+     * the last location from the database and populate the UI
+     * In case Appdatabase is empty we inform the user that the internet connection is lost
+     */
+    private void checkIfAppdatabaseIsEmpty() {
+        MainViewModel viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        viewModel.getLocation().observe(this, new Observer<List<JsonData>>() {
+            @Override
+            public void onChanged(@Nullable List<JsonData> jsonData) {
+                if ((jsonData != null)) {
+                    populateUi(jsonData);
+                } else {
+                    informUserConnectionLost();
+                }
+            }
+        });
+    }
+
+//    private void saveToFavourite() {
+//        mButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                AppExecutors.getInstance().diskIO().execute(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mDb.locationDao().insertLocation(mData);
+//                    }
+//                });
+//
+//            }
+//        });
+//    }
+
+   // method to inform user about lost internet connection
+    private void informUserConnectionLost() {
+        noInternet.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.INVISIBLE);
+        Snackbar snackbar = Snackbar.make(getActivity().findViewById(android.R.id.content),
+                R.string.connection_lost, Snackbar.LENGTH_LONG);
+        snackbar.show();
+    }
+
+    /*
+    -------------------------------Helper Methods --------------------------------------------------
+     */
+    //Helper method to check if there is Internet connection
+    private boolean isConnected() {
+        ConnectivityManager manager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = Objects.requireNonNull(manager).getActiveNetworkInfo();
+        return info != null && info.isConnectedOrConnecting();
+    }
     //Helper method to populate the UI
-    private void populateUi(JsonData jsonData) {
+    private void populateUi(List<JsonData> jsonData) {
         LinearLayoutManager manager = new LinearLayoutManager(getActivity().getBaseContext());
-        List<JsonData> dataList = new ArrayList<>();
-        dataList.add(jsonData);
-        mAdapter.addData(dataList);
+        mAdapter.addData(jsonData);
         mRecyclerView.setLayoutManager(manager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setNestedScrollingEnabled(true);
@@ -206,43 +259,16 @@ public class LocationFragment extends Fragment {
         mProgressBar.setVisibility(View.INVISIBLE);
     }
 
-    /**
-     * If there is no internet connection we can use a ViewModel to retrieve
-     * the last location from the database and populate the UI
-     */
-    private void setupViewModel() {
-        MainViewModel viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        viewModel.getLocation().observe(this, new Observer<List<JsonData>>() {
-            @Override
-            public void onChanged(@Nullable List<JsonData> jsonData) {
-                if ((jsonData != null)) {
-
-                }
-            }
-        });
+    @Override
+    public void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(AQIntentService.ACTION);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
     }
 
-    private void deletePlace() {
-
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            // Called when a user swipes left or right on a ViewHolder
-            @Override
-            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                // Here is where you'll implement swipe to delete
-                AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        int position = viewHolder.getAdapterPosition();
-                        List<JsonData> loc = mAdapter.getLocations();
-                        mDb.locationDao().deleteLocation(loc.get(position));
-                    }
-                });
-            }
-        }).attachToRecyclerView(mRecyclerView);
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
     }
 }

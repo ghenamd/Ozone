@@ -74,7 +74,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return 1;
+        return mJsonData.size();
     }
     public List<JsonData> getLocations(){return mJsonData;}
     public void addData(List<JsonData> data){

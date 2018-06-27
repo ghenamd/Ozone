@@ -25,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.ozone.R;
 import com.example.android.ozone.dialog.MarkerDialog;
@@ -102,6 +103,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Toast.makeText(getActivity(),"Map is ready",Toast.LENGTH_SHORT).show();
         mMap = googleMap;
         if (isConnected()) {
             googleMap.setMyLocationEnabled(true);
@@ -113,7 +115,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+        Toast.makeText(getActivity(),R.string.please_check_your_intenet_connection,Toast.LENGTH_SHORT).show();
     }
 
     private void init() {
@@ -191,6 +193,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             public boolean onMarkerClick(Marker marker) {
                 Intent intent = new Intent(getActivity(), MarkerDialog.class);
                 Bundle bundle =  new Bundle();
+                bundle.putString(OzoneConstants.LOCATION,marker.getTitle());
                 bundle.putDouble(OzoneConstants.LAT_MAP, marker.getPosition().latitude);
                 bundle.putDouble(OzoneConstants.LON_MAP,marker.getPosition().longitude);
                 intent.putExtra(OzoneConstants.BUNDLE_MAP,bundle);

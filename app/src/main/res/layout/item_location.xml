@@ -38,7 +38,6 @@
                 android:textColor="@color/gray"
                 android:textStyle="bold"
                 tools:text="Good" />
-
             <ImageView
                 android:id="@+id/circleView"
                 android:layout_width="130dp"

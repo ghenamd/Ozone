@@ -18,6 +18,10 @@ public interface LocationDao {
 
     @Query(" SELECT * FROM location ")
     LiveData<List<JsonData>> getAllLocations();
+
+    @Query(" SELECT * FROM location ")
+    List<JsonData> getAllPlaces();
+
     @Query("SELECT * FROM location WHERE city = :place")
     JsonData getLocationByName(String place);
 

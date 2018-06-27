@@ -1,26 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/dialog_location"/>
+    android:layout_height="wrap_content"
+    android:background="@color/dot_light_screen2"
+    xmlns:tools="http://schemas.android.com/tools">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/dialog_location"
+        android:layout_marginBottom="8dp"
+        android:id="@+id/linear1"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_marginStart="8dp"
+            android:textColor="@android:color/white"
+            tools:text="London"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            android:id="@+id/dialog_location"/>
+
+        <ImageButton
+            android:id="@+id/dialog_favourite"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:layout_height="32dp"
+            android:background="@color/dot_light_screen2"
+            android:src="@drawable/ic_star_white" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linear1"
         android:orientation="horizontal">
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:paddingStart="16dp"
+            android:layout_marginBottom="16dp"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
+            tools:text="AQI"
+            android:textColor="@android:color/white"
             android:id="@+id/dialog_aqi"/>
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            tools:text="23C"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"
+            android:textColor="@android:color/white"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
             android:id="@+id/dialog_temperature"/>
 
     </LinearLayout>
