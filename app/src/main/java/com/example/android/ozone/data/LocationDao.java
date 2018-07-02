@@ -22,16 +22,19 @@ public interface LocationDao {
     @Query(" SELECT * FROM location ")
     List<JsonData> getAllPlaces();
 
-    @Query("SELECT * FROM location WHERE city = :place")
-    JsonData getLocationByName(String place);
+    @Query("SELECT * FROM location WHERE city LIKE :city")
+    JsonData getLocationByName(String city);
 
     @Insert
-    void insertLocation (JsonData data);
+    void insertLocation(JsonData data);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateLocation(JsonData data);
 
     @Delete
     void deleteLocation(JsonData data);
+
+    @Query("DELETE FROM location")
+    void deleteAll();
 
 }

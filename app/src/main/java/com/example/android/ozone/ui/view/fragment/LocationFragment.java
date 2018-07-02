@@ -21,12 +21,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -38,6 +37,7 @@ import com.example.android.ozone.data.AppDatabase;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.network.AQIntentService;
 import com.example.android.ozone.ui.view.adapter.LocationAdapter;
+import com.example.android.ozone.utils.AppExecutors;
 import com.example.android.ozone.utils.OzoneConstants;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -63,7 +63,8 @@ import static android.app.Activity.RESULT_OK;
 public class LocationFragment extends Fragment {
 
     private AppDatabase mDb;
-    private JsonData mData = new JsonData();
+    private JsonData mData;
+    private JsonData dataFromDb = new JsonData();
     private LocationAdapter mAdapter;
     @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
@@ -73,41 +74,15 @@ public class LocationFragment extends Fragment {
     TextView noInternet;
     @BindView(R.id.relativeLayout)
     RelativeLayout mRelativeLayout;
-    //    @BindView(R.id.location_fav)
-//    ImageButton mButton;
+    @BindView(R.id.fav_button)
+    ImageButton mButton;
     private FusedLocationProviderClient mFusedLocationClient;
-    private boolean databaseIsNotEmpty;
+    private static final String TAG = "LocationFragment";
+    private boolean cityIsPresent;
+
 
     public LocationFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_app_bar,menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id){
-            case R.id.app_bar_favourite:
-
-                return true;
-            case R.id.app_bar_settings:
-
-                return true;
-            default:
-                break;
-        }
-        return false;
     }
 
     @Override
@@ -115,6 +90,7 @@ public class LocationFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_location, container, false);
         ButterKnife.bind(this, view);
+        setRetainInstance(true);
         mDb = AppDatabase.getInstance(getActivity());
         mAdapter = new LocationAdapter();
         if (isConnected()) {
@@ -123,6 +99,7 @@ public class LocationFragment extends Fragment {
         } else if (!isConnected()) {
             checkIfAppdatabaseIsEmpty();
         }
+        saveAsFavourite();
         return view;
     }
 
@@ -164,9 +141,11 @@ public class LocationFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 synchronized (getActivity()) {
                     mData = intent.getParcelableExtra("data");
+                    isFavourite(mData);
                     List<JsonData> list = new ArrayList<>();
                     list.add(mData);
                     populateUi(list);
+
                 }
             }
         }
@@ -215,22 +194,50 @@ public class LocationFragment extends Fragment {
         });
     }
 
-//    private void saveToFavourite() {
-//        mButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                AppExecutors.getInstance().diskIO().execute(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        mDb.locationDao().insertLocation(mData);
-//                    }
-//                });
-//
-//            }
-//        });
-//    }
+    private void saveAsFavourite() {
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (cityIsPresent) {
+                    mButton.setImageResource(R.drawable.ic_star_white);
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            //mDb.locationDao().deleteAll();
+                            mDb.locationDao().deleteLocation(dataFromDb);
+                            Log.d(TAG, "City deleted");
+                        }
+                    });
+                } else  {
+                    mButton.setImageResource(R.drawable.ic_star_yellow);
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDb.locationDao().insertLocation(mData);
+                            Log.d(TAG, "City added");
 
-   // method to inform user about lost internet connection
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+
+
+    private void isFavourite(JsonData jData) {
+        final String cityFromJd = jData.getCity();
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                dataFromDb = mDb.locationDao().getLocationByName(cityFromJd);
+
+            }
+        });
+        cityIsPresent = dataFromDb != null;
+    }
+
+    // method to inform user about lost internet connection
     private void informUserConnectionLost() {
         noInternet.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.INVISIBLE);
@@ -248,8 +255,10 @@ public class LocationFragment extends Fragment {
         NetworkInfo info = Objects.requireNonNull(manager).getActiveNetworkInfo();
         return info != null && info.isConnectedOrConnecting();
     }
+
     //Helper method to populate the UI
     private void populateUi(List<JsonData> jsonData) {
+        mButton.setVisibility(View.VISIBLE);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity().getBaseContext());
         mAdapter.addData(jsonData);
         mRecyclerView.setLayoutManager(manager);
@@ -271,4 +280,5 @@ public class LocationFragment extends Fragment {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
     }
+
 }
