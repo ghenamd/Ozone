@@ -25,11 +25,11 @@ public interface LocationDao {
     @Query("SELECT * FROM location WHERE city LIKE :city")
     JsonData getLocationByName(String city);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertLocation(JsonData data);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateLocation(JsonData data);
+    int updateLocation(JsonData data);
 
     @Delete
     void deleteLocation(JsonData data);

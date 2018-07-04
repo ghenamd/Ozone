@@ -18,6 +18,20 @@ public class MainActivity extends AppCompatActivity {
 
     private ActionBar mActionBar;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mActionBar = getSupportActionBar();
+        mActionBar.setTitle(R.string.location);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        LocationFragment locationFragment = new LocationFragment();
+        transaction.replace(R.id.main_container, locationFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+        BottomNavigationView navigationView = findViewById(R.id.navigation);
+        navigationView.setOnNavigationItemSelectedListener(mBottomNavigationView);
+    }
     private BottomNavigationView.OnNavigationItemSelectedListener mBottomNavigationView = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
@@ -53,21 +67,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mActionBar = getSupportActionBar();
-        mActionBar.setTitle(R.string.location);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        LocationFragment locationFragment = new LocationFragment();
-        transaction.replace(R.id.main_container, locationFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-        BottomNavigationView navigationView = findViewById(R.id.navigation);
-        navigationView.setOnNavigationItemSelectedListener(mBottomNavigationView);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_app_bar, menu);
@@ -79,13 +78,10 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.app_bar_settings:
-
                 return true;
             default:
                 break;
         }
         return false;
     }
-
-
 }

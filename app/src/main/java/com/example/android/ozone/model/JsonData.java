@@ -5,22 +5,16 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 @Entity(tableName = "location")
 public class JsonData implements Parcelable {
-    public int getId() {
-        return id;
-    }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    @PrimaryKey(autoGenerate = true)
-    private int id;
+    @PrimaryKey
+    @NonNull
     @SerializedName("city")
     @Expose
     private String city;
@@ -73,7 +67,7 @@ public class JsonData implements Parcelable {
     public JsonData() {
     }
 
-    @Ignore
+
     public JsonData(String city, String state, String country, String ts, int hu,
                     String ic, int pr, int tp, int wd, double ws, int aqius, int aqicn) {
         this.city = city;
@@ -90,22 +84,6 @@ public class JsonData implements Parcelable {
         this.aqicn = aqicn;
     }
 
-    public JsonData(int id, String city, String state, String country, String ts,
-                    int hu, String ic, int pr, int tp, int wd, double ws, int aqius, int aqicn) {
-        this.id = id;
-        this.city = city;
-        this.state = state;
-        this.country = country;
-        this.ts = ts;
-        this.hu = hu;
-        this.ic = ic;
-        this.pr = pr;
-        this.tp = tp;
-        this.wd = wd;
-        this.ws = ws;
-        this.aqius = aqius;
-        this.aqicn = aqicn;
-    }
 
     protected JsonData(Parcel in) {
         city = in.readString();

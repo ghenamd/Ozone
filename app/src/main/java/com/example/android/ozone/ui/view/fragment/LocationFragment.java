@@ -16,16 +16,15 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -50,7 +49,6 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -64,7 +62,6 @@ public class LocationFragment extends Fragment {
 
     private AppDatabase mDb;
     private JsonData mData;
-    private JsonData dataFromDb = new JsonData();
     private LocationAdapter mAdapter;
     @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
@@ -74,12 +71,7 @@ public class LocationFragment extends Fragment {
     TextView noInternet;
     @BindView(R.id.relativeLayout)
     RelativeLayout mRelativeLayout;
-    @BindView(R.id.fav_button)
-    ImageButton mButton;
     private FusedLocationProviderClient mFusedLocationClient;
-    private static final String TAG = "LocationFragment";
-    private boolean cityIsPresent;
-
 
     public LocationFragment() {
         // Required empty public constructor
@@ -96,10 +88,28 @@ public class LocationFragment extends Fragment {
         if (isConnected()) {
             mProgressBar.setVisibility(View.VISIBLE);
             initPermissions();
-        } else if (!isConnected()) {
-            checkIfAppdatabaseIsEmpty();
+        } else {
+            informUserConnectionLost();
         }
-        saveAsFavourite();
+        final BottomNavigationView bottom_navigation = getActivity().findViewById(R.id.navigation);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0 && bottom_navigation.isShown()) {
+                    bottom_navigation.setVisibility(View.GONE);
+                } else if (dy < 0 ) {
+                    bottom_navigation.setVisibility(View.VISIBLE);
+
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
+        setupViewModel();
         return view;
     }
 
@@ -141,11 +151,13 @@ public class LocationFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 synchronized (getActivity()) {
                     mData = intent.getParcelableExtra("data");
-                    isFavourite(mData);
-                    List<JsonData> list = new ArrayList<>();
-                    list.add(mData);
-                    populateUi(list);
-
+                    //checkIfDataExistsElseInsert(mData);
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDb.locationDao().insertLocation(mData);
+                        }
+                    });
                 }
             }
         }
@@ -180,62 +192,22 @@ public class LocationFragment extends Fragment {
      * the last location from the database and populate the UI
      * In case Appdatabase is empty we inform the user that the internet connection is lost
      */
-    private void checkIfAppdatabaseIsEmpty() {
+    private void setupViewModel() {
         MainViewModel viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         viewModel.getLocation().observe(this, new Observer<List<JsonData>>() {
             @Override
             public void onChanged(@Nullable List<JsonData> jsonData) {
                 if ((jsonData != null)) {
                     populateUi(jsonData);
-                } else {
-                    informUserConnectionLost();
+                } else{
+                    Snackbar bar = Snackbar.make(getActivity().findViewById(android.R.id.content),
+                            getString(R.string.database_is_empty),Snackbar.LENGTH_SHORT);
+                    bar.show();
                 }
             }
         });
     }
 
-    private void saveAsFavourite() {
-        mButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (cityIsPresent) {
-                    mButton.setImageResource(R.drawable.ic_star_white);
-                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            //mDb.locationDao().deleteAll();
-                            mDb.locationDao().deleteLocation(dataFromDb);
-                            Log.d(TAG, "City deleted");
-                        }
-                    });
-                } else  {
-                    mButton.setImageResource(R.drawable.ic_star_yellow);
-                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            mDb.locationDao().insertLocation(mData);
-                            Log.d(TAG, "City added");
-
-                        }
-                    });
-                }
-            }
-        });
-    }
-
-
-
-    private void isFavourite(JsonData jData) {
-        final String cityFromJd = jData.getCity();
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                dataFromDb = mDb.locationDao().getLocationByName(cityFromJd);
-
-            }
-        });
-        cityIsPresent = dataFromDb != null;
-    }
 
     // method to inform user about lost internet connection
     private void informUserConnectionLost() {
@@ -258,7 +230,6 @@ public class LocationFragment extends Fragment {
 
     //Helper method to populate the UI
     private void populateUi(List<JsonData> jsonData) {
-        mButton.setVisibility(View.VISIBLE);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity().getBaseContext());
         mAdapter.addData(jsonData);
         mRecyclerView.setLayoutManager(manager);

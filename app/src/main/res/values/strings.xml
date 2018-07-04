@@ -42,6 +42,8 @@
     <string name="data_unavailable">Data unavailable</string>
     <string name="connection_lost">Connection Lost</string>
     <string name="settings">Settings</string>
+    <string name="database_is_empty">Database is empty</string>
+    <string name="no_fav_available">No favorites available</string>
 
 
 </resources>

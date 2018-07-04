@@ -3,6 +3,7 @@ package com.example.android.ozone.dialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -36,6 +37,7 @@ public class MarkerDialog extends AppCompatActivity {
     ImageButton mButton;
     AppDatabase mDatabase;
     private JsonData mJsonData;
+    private static final String TAG = "MarkerDialog";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,21 +52,6 @@ public class MarkerDialog extends AppCompatActivity {
         mAsyncMap = new AsyncMap();
         mAsyncMap.execute();
 
-    }
-
-    private boolean isFavourite(final String place) {
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                mJsonData = mDatabase.locationDao().getLocationByName(place);
-            }
-        });
-        if (mJsonData != null && place.equals(mJsonData.getCity())){
-            mButton.setImageResource(R.drawable.ic_star_yellow);
-            return true;
-        }else{
-            return false;
-        }
     }
 
     public class AsyncMap extends AsyncTask<Void, Void, JsonData> {
@@ -87,7 +74,7 @@ public class MarkerDialog extends AppCompatActivity {
             mLocation.setText(location);
             if (data != null) {
                 mDialogAqi.setText(getString(R.string.aqi) + data.getAqius());
-
+                mButton.setVisibility(View.VISIBLE);
                 StringBuilder builder = new StringBuilder();
                 builder.append("Temp: ").append(String.valueOf(data.getTp())).append("C");
                 mDialogTemperature.setText(builder);
@@ -97,30 +84,50 @@ public class MarkerDialog extends AppCompatActivity {
             setAsFavourite(data);
         }
     }
-    private void setAsFavourite(final JsonData data){
+
+    private void setAsFavourite(final JsonData data) {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isFavourite(location)){
+                if (isFavourite(location)) {
                     mButton.setImageResource(R.drawable.ic_star_white);
                     AppExecutors.getInstance().diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
-                            mDatabase.locationDao().insertLocation(data);
+                            if (mDatabase!=null){
+                            mDatabase.locationDao().deleteLocation(mJsonData);}
+                            Log.d(TAG, "run: Deleted");
                         }
                     });
-                }else if (!isFavourite(location)){
+                } else if (!isFavourite(location)) {
                     mButton.setImageResource(R.drawable.ic_star_yellow);
                     AppExecutors.getInstance().diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
-                            mDatabase.locationDao().deleteLocation(data);
+                            mDatabase.locationDao().insertLocation(data);
+                            Log.d(TAG, "run: Inserted");
                         }
                     });
 
                 }
             }
         });
+    }
+
+    private boolean isFavourite(final String place) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mJsonData = mDatabase.locationDao().getLocationByName(place);
+            }
+        });
+        if (mJsonData != null ) {
+            mButton.setImageResource(R.drawable.ic_star_yellow);
+            return true;
+        } else {
+            mButton.setImageResource(R.drawable.ic_star_white);
+            return false;
+        }
     }
 
     @Override

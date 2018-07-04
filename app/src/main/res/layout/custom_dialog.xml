@@ -27,6 +27,7 @@
             android:layout_weight="1"
             android:layout_gravity="center"
             android:layout_height="32dp"
+            android:visibility="invisible"
             android:background="@color/dot_light_screen2"
             android:src="@drawable/ic_star_white" />
     </LinearLayout>

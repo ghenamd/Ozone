@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.android.ozone.R;
 import com.example.android.ozone.ViewModel.MainViewModel;
@@ -33,6 +35,8 @@ public class FavouriteFragment extends Fragment {
 
     @BindView(R.id.fav_frag_recycler)
     RecyclerView mRecyclerView;
+    @BindView(R.id.no_fav_text)
+    TextView noFavText;
     private AppDatabase mDatabase;
     private FavouriteAdapter mFavouriteAdapter;
 
@@ -41,12 +45,31 @@ public class FavouriteFragment extends Fragment {
     }
 
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_favourite, container, false);
         ButterKnife.bind(this, view);
         mDatabase = AppDatabase.getInstance(getActivity());
+        final BottomNavigationView bottom_navigation = getActivity().findViewById(R.id.navigation);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0 && bottom_navigation.isShown()) {
+                    bottom_navigation.setVisibility(View.GONE);
+                } else if (dy < 0 ) {
+                    bottom_navigation.setVisibility(View.VISIBLE);
+
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
         setupViewModel();
         deletePlace();
         return view;
@@ -59,7 +82,9 @@ public class FavouriteFragment extends Fragment {
             public void onChanged(@Nullable List<JsonData> jsonData) {
                 if ((jsonData != null)) {
                    populateUi(jsonData);
-
+                }else if (jsonData == null){
+                    noFavText.setVisibility(View.VISIBLE);
+                    noFavText.setText(R.string.no_fav_available);
                 }
             }
         });
