@@ -1,12 +1,15 @@
 package com.example.android.ozone.dialog;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.ozone.R;
 import com.example.android.ozone.data.AppDatabase;
@@ -14,6 +17,8 @@ import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.network.FetchData;
 import com.example.android.ozone.utils.AppExecutors;
 import com.example.android.ozone.utils.OzoneConstants;
+import com.example.android.ozone.viewModel.QueryByNameViewModel;
+import com.example.android.ozone.viewModel.QueryByNameViewModelFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -25,7 +30,6 @@ public class MarkerDialog extends AppCompatActivity {
 
     private double lat;
     private double lon;
-    private String location;
     @BindView(R.id.dialog_location)
     TextView mLocation;
     @BindView(R.id.dialog_aqi)
@@ -35,9 +39,13 @@ public class MarkerDialog extends AppCompatActivity {
     AsyncMap mAsyncMap;
     @BindView(R.id.dialog_favourite)
     ImageButton mButton;
-    AppDatabase mDatabase;
-    private JsonData mJsonData;
+    private AppDatabase mDatabase;
+    @BindView(R.id.dialog_error)
+    TextView errorText;
     private static final String TAG = "MarkerDialog";
+    public JsonData mData = new JsonData();
+    private String loc=null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +54,11 @@ public class MarkerDialog extends AppCompatActivity {
         ButterKnife.bind(this);
         mDatabase = AppDatabase.getInstance(this);
         Bundle bundle = getIntent().getBundleExtra(OzoneConstants.BUNDLE_MAP);
-        location = bundle.getString(OzoneConstants.LOCATION);
         lat = bundle.getDouble(OzoneConstants.LAT_MAP);
         lon = bundle.getDouble(OzoneConstants.LON_MAP);
         mAsyncMap = new AsyncMap();
         mAsyncMap.execute();
+        setAsFavourite();
 
     }
 
@@ -71,63 +79,74 @@ public class MarkerDialog extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(JsonData data) {
-            mLocation.setText(location);
             if (data != null) {
+                mData = data;
+                mLocation.setText(data.getCity());
+                isFavourite(data.getCity());
                 mDialogAqi.setText(getString(R.string.aqi) + data.getAqius());
                 mButton.setVisibility(View.VISIBLE);
                 StringBuilder builder = new StringBuilder();
                 builder.append("Temp: ").append(String.valueOf(data.getTp())).append("C");
                 mDialogTemperature.setText(builder);
             } else {
-                mDialogAqi.setText(R.string.aqi_data_unavailable);
+                errorText.setText(R.string.aqi_data_unavailable);
             }
-            setAsFavourite(data);
+
         }
     }
 
-    private void setAsFavourite(final JsonData data) {
+    private void setAsFavourite() {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isFavourite(location)) {
+                if (isFavourite(mData.getCity())) {
                     mButton.setImageResource(R.drawable.ic_star_white);
-                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mDatabase!=null){
-                            mDatabase.locationDao().deleteLocation(mJsonData);}
-                            Log.d(TAG, "run: Deleted");
-                        }
-                    });
-                } else if (!isFavourite(location)) {
+                    deleteFavorite(mData);
+                    showToastDeleted();
+                } else if (!isFavourite(mData.getCity())) {
                     mButton.setImageResource(R.drawable.ic_star_yellow);
-                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            mDatabase.locationDao().insertLocation(data);
-                            Log.d(TAG, "run: Inserted");
-                        }
-                    });
-
+                    addFavorite(mData);
+                    showToastInserted();
                 }
             }
         });
     }
 
     private boolean isFavourite(final String place) {
+        QueryByNameViewModelFactory factory = new QueryByNameViewModelFactory(mDatabase,mData.getCity());
+        QueryByNameViewModel byNameViewModel = ViewModelProviders.of(this,factory).get(QueryByNameViewModel.class);
+        byNameViewModel.getPlace().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String str) {
+                loc = str;
+            }
+        });
+        if (place.equals(loc)){
+            mButton.setImageResource(R.drawable.ic_star_yellow);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    private void deleteFavorite(final JsonData jsonData) {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                mJsonData = mDatabase.locationDao().getLocationByName(place);
+                if (mDatabase != null) {
+                    mDatabase.locationDao().deleteLocation(jsonData);
+                }
             }
         });
-        if (mJsonData != null ) {
-            mButton.setImageResource(R.drawable.ic_star_yellow);
-            return true;
-        } else {
-            mButton.setImageResource(R.drawable.ic_star_white);
-            return false;
-        }
+    }
+
+    private void addFavorite(final JsonData jsonData) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDatabase.locationDao().insertLocation(jsonData);
+            }
+        });
     }
 
     @Override
@@ -135,4 +154,12 @@ public class MarkerDialog extends AppCompatActivity {
         super.onStop();
         mAsyncMap.cancel(true);
     }
+    private void showToastInserted(){
+        Toast.makeText(this, getString(R.string.location_inserted), Toast.LENGTH_SHORT).show();
+    }
+    private void showToastDeleted(){
+        Toast.makeText(this, R.string.location_deleted, Toast.LENGTH_SHORT).show();
+    }
+
+
 }

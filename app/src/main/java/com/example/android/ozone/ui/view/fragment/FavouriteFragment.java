@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.ozone.R;
-import com.example.android.ozone.ViewModel.MainViewModel;
+import com.example.android.ozone.viewModel.MainViewModel;
 import com.example.android.ozone.data.AppDatabase;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.ui.view.adapter.FavouriteAdapter;

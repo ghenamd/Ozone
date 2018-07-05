@@ -5,7 +5,7 @@
     <string name="start">GOT IT</string>
 
     <string name="slide_1_title">AQI</string>
-    <string name="slide_1_desc">Monitor air quality index!</string>
+    <string name="slide_1_desc">Get nearest city air quality index !</string>
 
     <string name="slide_2_title">Advice</string>
     <string name="slide_2_desc">Get outdoor activity suggestions!</string>
@@ -38,12 +38,14 @@
     <string name="desc_hazardous">Health warnings of emergency conditions. The entire population is more likely to be affected.</string>
     <string name="my_location">My Location</string>
     <string name="aqi">AQI: </string>
-    <string name="aqi_data_unavailable">AQI: Data unavailable</string>
+    <string name="aqi_data_unavailable">Insufficient data for your location</string>
     <string name="data_unavailable">Data unavailable</string>
     <string name="connection_lost">Connection Lost</string>
     <string name="settings">Settings</string>
     <string name="database_is_empty">Database is empty</string>
     <string name="no_fav_available">No favorites available</string>
+    <string name="location_inserted">Location added to favorites</string>
+    <string name="location_deleted">Location deleted from favorites</string>
 
 
 </resources>

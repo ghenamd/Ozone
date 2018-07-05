@@ -59,5 +59,11 @@
             android:id="@+id/dialog_temperature"/>
 
     </LinearLayout>
+    <TextView
+        android:id="@+id/dialog_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        tools:text="No data"/>
 
 </RelativeLayout>

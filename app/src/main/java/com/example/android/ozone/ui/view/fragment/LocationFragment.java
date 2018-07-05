@@ -31,7 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.ozone.R;
-import com.example.android.ozone.ViewModel.MainViewModel;
+import com.example.android.ozone.viewModel.MainViewModel;
 import com.example.android.ozone.data.AppDatabase;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.network.AQIntentService;

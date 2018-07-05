@@ -19,6 +19,7 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (LOCK) {
                 sInstance = Room.databaseBuilder(context.getApplicationContext(),
                         AppDatabase.class, AppDatabase.DATABASE_NAME)
+                        .allowMainThreadQueries()// For small amount of data to be checked if is present in the database
                         .build();
             }
         }

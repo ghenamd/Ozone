@@ -1,4 +1,4 @@
-package com.example.android.ozone.ViewModel;
+package com.example.android.ozone.viewModel;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -18,12 +18,10 @@ public class MainViewModel extends AndroidViewModel {
         super(application);
         AppDatabase appDatabase = AppDatabase.getInstance(this.getApplication());
         location = appDatabase.locationDao().getAllLocations();
-
     }
 
     public LiveData<List<JsonData>> getLocation() {
         return location;
     }
-
 
 }

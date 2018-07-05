@@ -25,6 +25,9 @@ public interface LocationDao {
     @Query("SELECT * FROM location WHERE city LIKE :city")
     JsonData getLocationByName(String city);
 
+    @Query("SELECT city FROM location WHERE city LIKE :place")
+    LiveData<String> getCityFromDb (String place);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertLocation(JsonData data);
 
