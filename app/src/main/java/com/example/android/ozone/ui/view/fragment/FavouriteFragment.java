@@ -16,11 +16,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.ozone.R;
-import com.example.android.ozone.viewModel.MainViewModel;
 import com.example.android.ozone.data.AppDatabase;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.ui.view.adapter.FavouriteAdapter;
 import com.example.android.ozone.utils.AppExecutors;
+import com.example.android.ozone.viewModel.MainViewModel;
+import com.example.android.ozone.widget.OzoneWidgetIntentService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class FavouriteFragment extends Fragment {
     TextView noFavText;
     private AppDatabase mDatabase;
     private FavouriteAdapter mFavouriteAdapter;
+    public static List<JsonData> favData = new ArrayList<>();
 
     public FavouriteFragment() {
         // Required empty public constructor
@@ -71,6 +73,7 @@ public class FavouriteFragment extends Fragment {
             }
         });
         setupViewModel();
+        OzoneWidgetIntentService.startUpdateOzoneWidget(getActivity().getBaseContext());
         deletePlace();
         return view;
     }
@@ -82,12 +85,15 @@ public class FavouriteFragment extends Fragment {
             public void onChanged(@Nullable List<JsonData> jsonData) {
                 if ((jsonData != null)) {
                    populateUi(jsonData);
-                }else if (jsonData == null){
+                }else {
                     noFavText.setVisibility(View.VISIBLE);
                     noFavText.setText(R.string.no_fav_available);
                 }
             }
         });
+
+       favData = viewModel.getDataList();
+
     }
 
     private void deletePlace(){
@@ -121,4 +127,5 @@ public class FavouriteFragment extends Fragment {
         mRecyclerView.setLayoutManager(manager);
         mRecyclerView.setAdapter(mFavouriteAdapter);
     }
+
 }

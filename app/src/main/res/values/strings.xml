@@ -46,6 +46,9 @@
     <string name="no_fav_available">No favorites available</string>
     <string name="location_inserted">Location added to favorites</string>
     <string name="location_deleted">Location deleted from favorites</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="no_favorite_places">No favorite places</string>
 
 
 </resources>

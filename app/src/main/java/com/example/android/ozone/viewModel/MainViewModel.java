@@ -13,15 +13,20 @@ import java.util.List;
 public class MainViewModel extends AndroidViewModel {
 
     private LiveData<List<JsonData>> location;
+    private List<JsonData> mDataList;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
         AppDatabase appDatabase = AppDatabase.getInstance(this.getApplication());
         location = appDatabase.locationDao().getAllLocations();
+        mDataList = appDatabase.locationDao().getAllPlaces();
+
     }
 
     public LiveData<List<JsonData>> getLocation() {
         return location;
     }
-
+    public List<JsonData> getDataList() {
+        return mDataList;
+    }
 }

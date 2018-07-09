@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:padding="@dimen/widget_margin"
+    android:orientation="vertical">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:background="@color/dot_dark_screen2"
+        android:layout_height="wrap_content">
+     <TextView
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:id="@+id/widget_no_fav"
+         android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+         android:text="@string/app_name"
+         android:layout_marginStart="16dp"
+         android:layout_marginTop="8dp"
+         android:layout_marginBottom="8dp"
+
+         android:textColor="@android:color/white"/>
+    </FrameLayout>
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/widget_list_view"
+        />
+
+</LinearLayout>

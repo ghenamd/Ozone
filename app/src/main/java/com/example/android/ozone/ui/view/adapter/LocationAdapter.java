@@ -14,7 +14,6 @@ import com.example.android.ozone.model.JsonData;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -22,9 +21,10 @@ import butterknife.ButterKnife;
 
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
     private static final String TAG = "LocationAdapter";
-    private List <JsonData> mJsonData;
+    private JsonData mData;
 
-    public LocationAdapter() {
+    public LocationAdapter(JsonData data) {
+        mData =data;
 
     }
 
@@ -37,7 +37,6 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull LocationAdapter.ViewHolder holder, int position) {
-        JsonData mData = mJsonData.get(position);
         holder.aqiNumber.setText(String.valueOf(mData.getAqius()));
         holder.city.setText(mData.getCity());
         holder.country.setText(mData.getState() +", " +mData.getCountry());
@@ -74,11 +73,11 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return mJsonData.size();
+        return 1;
     }
-    public List<JsonData> getLocations(){return mJsonData;}
-    public void addData(List<JsonData> data){
-        mJsonData = data;
+    public JsonData getCurrentLocation(){return mData;}
+    public void addData(JsonData data){
+        mData = data;
         notifyDataSetChanged();
     }
 

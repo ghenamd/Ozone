@@ -35,12 +35,29 @@
         <service android:name=".network.MapsIntentService" />
         <service android:name=".dialog.MarkerDialog" />
 
+        <service android:name=".widget.OzoneRemoteViewService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
+
+        <service android:name=".widget.OzoneWidgetIntentService" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBp9XW42V5Uu8bvTsYS1uymPmFsBzSRW9k" />
 
-        <activity android:name=".dialog.MarkerDialog"
-            android:theme="@style/Theme.AppCompat.Dialog"/>
+        <activity
+            android:name=".dialog.MarkerDialog"
+            android:theme="@style/Theme.AppCompat.Dialog" />
+        <activity android:name=".ui.view.DetailsActivity" />
+
+        <receiver android:name=".widget.OzoneWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/ozone_widget_info" />
+        </receiver>
     </application>
 
 </manifest>
