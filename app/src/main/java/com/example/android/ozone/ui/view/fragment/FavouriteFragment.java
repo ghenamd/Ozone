@@ -3,6 +3,7 @@ package com.example.android.ozone.ui.view.fragment;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
@@ -17,9 +18,12 @@ import android.widget.TextView;
 
 import com.example.android.ozone.R;
 import com.example.android.ozone.data.AppDatabase;
+import com.example.android.ozone.dialog.DetailsDialog;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.ui.view.adapter.FavouriteAdapter;
 import com.example.android.ozone.utils.AppExecutors;
+import com.example.android.ozone.utils.Helper;
+import com.example.android.ozone.utils.OzoneConstants;
 import com.example.android.ozone.viewModel.MainViewModel;
 import com.example.android.ozone.widget.OzoneWidgetIntentService;
 
@@ -32,7 +36,7 @@ import butterknife.ButterKnife;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FavouriteFragment extends Fragment {
+public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLocationClicked{
 
     @BindView(R.id.fav_frag_recycler)
     RecyclerView mRecyclerView;
@@ -47,7 +51,6 @@ public class FavouriteFragment extends Fragment {
     }
 
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -60,7 +63,7 @@ public class FavouriteFragment extends Fragment {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (dy > 0 && bottom_navigation.isShown()) {
                     bottom_navigation.setVisibility(View.GONE);
-                } else if (dy < 0 ) {
+                } else if (dy < 0) {
                     bottom_navigation.setVisibility(View.VISIBLE);
 
                 }
@@ -84,20 +87,20 @@ public class FavouriteFragment extends Fragment {
             @Override
             public void onChanged(@Nullable List<JsonData> jsonData) {
                 if ((jsonData != null)) {
-                   populateUi(jsonData);
-                }else {
+                    populateUi(jsonData);
+                } else {
                     noFavText.setVisibility(View.VISIBLE);
                     noFavText.setText(R.string.no_fav_available);
                 }
             }
         });
 
-       favData = viewModel.getDataList();
+        favData = viewModel.getDataList();
 
     }
 
-    private void deletePlace(){
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT) {
+    private void deletePlace() {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
                 return false;
@@ -105,12 +108,16 @@ public class FavouriteFragment extends Fragment {
 
             @Override
             public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
+                List<JsonData> jd = mFavouriteAdapter.getData();
+                JsonData jsd = jd.get(viewHolder.getAdapterPosition());
+                Helper.showToastDeleted(getActivity(),jsd.getCity());
                 AppExecutors.getInstance().diskIO().execute(new Runnable() {
                     @Override
                     public void run() {
                         int position = viewHolder.getAdapterPosition();
                         List<JsonData> jsonData = mFavouriteAdapter.getData();
-                        mDatabase.locationDao().deleteLocation(jsonData.get(position));
+                         mDatabase.locationDao().deleteLocation(jsonData.get(position));
+
                     }
                 });
             }
@@ -118,8 +125,8 @@ public class FavouriteFragment extends Fragment {
     }
 
     //Helper method to populate the Ui
-    private void populateUi(List<JsonData> data){
-        mFavouriteAdapter = new FavouriteAdapter(new ArrayList<JsonData>());
+    private void populateUi(List<JsonData> data) {
+        mFavouriteAdapter = new FavouriteAdapter(new ArrayList<JsonData>(),this);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity().getBaseContext());
         mFavouriteAdapter.addData(data);
         mRecyclerView.setHasFixedSize(true);
@@ -128,4 +135,10 @@ public class FavouriteFragment extends Fragment {
         mRecyclerView.setAdapter(mFavouriteAdapter);
     }
 
+    @Override
+    public void onItemClicked(JsonData data) {
+        Intent intent = new Intent(getActivity(), DetailsDialog.class);
+        intent.putExtra(OzoneConstants.DETAILS, data);
+        startActivity(intent);
+    }
 }

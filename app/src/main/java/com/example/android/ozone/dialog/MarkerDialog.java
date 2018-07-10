@@ -9,13 +9,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.ozone.R;
 import com.example.android.ozone.data.AppDatabase;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.network.FetchData;
 import com.example.android.ozone.utils.AppExecutors;
+import com.example.android.ozone.utils.Helper;
 import com.example.android.ozone.utils.OzoneConstants;
 import com.example.android.ozone.viewModel.QueryByNameViewModel;
 import com.example.android.ozone.viewModel.QueryByNameViewModelFactory;
@@ -102,11 +102,11 @@ public class MarkerDialog extends AppCompatActivity {
                 if (isFavourite(mData.getCity())) {
                     mButton.setImageResource(R.drawable.ic_star_white);
                     deleteFavorite(mData);
-                    showToastDeleted();
+                    Helper.showToastDeleted(getBaseContext(),mData.getCity());
                 } else if (!isFavourite(mData.getCity())) {
                     mButton.setImageResource(R.drawable.ic_star_yellow);
                     addFavorite(mData);
-                    showToastInserted();
+                    Helper.showToastInserted(getBaseContext(),mData.getCity());
                 }
             }
         });
@@ -154,12 +154,5 @@ public class MarkerDialog extends AppCompatActivity {
         super.onStop();
         mAsyncMap.cancel(true);
     }
-    private void showToastInserted(){
-        Toast.makeText(this, getString(R.string.location_inserted), Toast.LENGTH_SHORT).show();
-    }
-    private void showToastDeleted(){
-        Toast.makeText(this, R.string.location_deleted, Toast.LENGTH_SHORT).show();
-    }
-
 
 }

@@ -47,7 +47,9 @@
         <activity
             android:name=".dialog.MarkerDialog"
             android:theme="@style/Theme.AppCompat.Dialog" />
-        <activity android:name=".ui.view.DetailsActivity" />
+        <activity android:name=".dialog.DetailsDialog"
+            android:theme="@style/Theme.AppCompat.Dialog"/>
+
 
         <receiver android:name=".widget.OzoneWidget">
             <intent-filter>

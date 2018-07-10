@@ -37,6 +37,20 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
+    <style name="icon_details_dialog">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">@dimen/icon_details_dialog_width</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
+    <style name="text_icon_details_dialog">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">start</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textSize">@dimen/roboto_reg_10</item>
+    </style>
 
 </resources>

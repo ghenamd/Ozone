@@ -35,7 +35,7 @@ public interface LocationDao {
     int updateLocation(JsonData data);
 
     @Delete
-    void deleteLocation(JsonData data);
+    int deleteLocation(JsonData data);
 
     @Query("DELETE FROM location")
     void deleteAll();

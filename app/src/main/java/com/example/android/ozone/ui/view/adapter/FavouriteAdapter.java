@@ -17,9 +17,11 @@ import butterknife.ButterKnife;
 
 public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.ViewHolder> {
     private List<JsonData> mData;
+    private OnLocationClicked mLocationClicked;
 
-    public FavouriteAdapter(List<JsonData> dataList) {
+    public FavouriteAdapter(List<JsonData> dataList, OnLocationClicked clicked) {
         mData = dataList;
+        mLocationClicked = clicked;
     }
 
     @NonNull
@@ -63,6 +65,9 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
         }
 
     }
+    public interface OnLocationClicked{
+        void onItemClicked(JsonData data);
+    }
 
     @Override
     public int getItemCount() {
@@ -75,7 +80,7 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
         return mData;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @BindView(R.id.favourite_city)
         TextView mCity;
         @BindView(R.id.favourite_air_status)
@@ -89,6 +94,14 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition();
+            JsonData jd = mData.get(position);
+            mLocationClicked.onItemClicked(jd);
         }
     }
 }

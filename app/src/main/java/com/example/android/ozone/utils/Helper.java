@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.ui.view.adapter.LocationAdapter;
@@ -41,5 +42,12 @@ public class Helper {
         recyclerView.setNestedScrollingEnabled(true);
         recyclerView.setAdapter(adapter);
         bar.setVisibility(View.INVISIBLE);
+    }
+
+    public static void showToastInserted(Context context, String city){
+        Toast.makeText(context, city + " added", Toast.LENGTH_SHORT).show();
+    }
+    public static void showToastDeleted(Context context, String city){
+        Toast.makeText(context, city+ " deleted", Toast.LENGTH_SHORT).show();
     }
 }
