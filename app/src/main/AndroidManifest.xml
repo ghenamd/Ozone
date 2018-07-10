@@ -16,7 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".slider.WelcomeActivity">
+        <activity android:name=".utils.slider.WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,7 +33,7 @@
             android:name=".network.AQIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service android:name=".network.MapsIntentService" />
-        <service android:name=".dialog.MarkerDialog" />
+        <service android:name=".ui.view.dialog.MarkerDialog" />
 
         <service android:name=".widget.OzoneRemoteViewService"
             android:permission="android.permission.BIND_REMOTEVIEWS"/>
@@ -45,9 +45,9 @@
             android:value="AIzaSyBp9XW42V5Uu8bvTsYS1uymPmFsBzSRW9k" />
 
         <activity
-            android:name=".dialog.MarkerDialog"
+            android:name=".ui.view.dialog.MarkerDialog"
             android:theme="@style/Theme.AppCompat.Dialog" />
-        <activity android:name=".dialog.DetailsDialog"
+        <activity android:name=".ui.view.dialog.DetailsDialog"
             android:theme="@style/Theme.AppCompat.Dialog"/>
 
 

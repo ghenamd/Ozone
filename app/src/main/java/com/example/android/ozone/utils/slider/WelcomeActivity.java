@@ -1,4 +1,4 @@
-package com.example.android.ozone.slider;
+package com.example.android.ozone.utils.slider;
 
 import android.content.Context;
 import android.content.Intent;

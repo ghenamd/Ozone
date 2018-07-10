@@ -1,4 +1,4 @@
-package com.example.android.ozone.dialog;
+package com.example.android.ozone.ui.view.dialog;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

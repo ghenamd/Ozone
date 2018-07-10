@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import com.example.android.ozone.R;
 import com.example.android.ozone.data.AppDatabase;
-import com.example.android.ozone.dialog.DetailsDialog;
+import com.example.android.ozone.ui.view.dialog.DetailsDialog;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.ui.view.adapter.FavouriteAdapter;
 import com.example.android.ozone.utils.AppExecutors;

@@ -28,7 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.ozone.R;
-import com.example.android.ozone.dialog.MarkerDialog;
+import com.example.android.ozone.ui.view.dialog.MarkerDialog;
 import com.example.android.ozone.model.PlaceInfo;
 import com.example.android.ozone.utils.OzoneConstants;
 import com.example.android.ozone.utils.PlaceAutocompleteAdapter;
