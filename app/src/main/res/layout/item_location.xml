@@ -22,7 +22,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <RelativeLayout
-            android:background="@color/pink"
+            android:background="@android:color/white"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -151,7 +151,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/pink">
+            android:background="@android:color/white">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:id="@+id/linear_details"

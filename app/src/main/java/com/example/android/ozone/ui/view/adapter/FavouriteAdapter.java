@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.example.android.ozone.R;
 import com.example.android.ozone.model.JsonData;
+import com.example.android.ozone.utils.AnimatorUtil;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ import butterknife.ButterKnife;
 public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.ViewHolder> {
     private List<JsonData> mData;
     private OnLocationClicked mLocationClicked;
+    int prevPosition = 0;
 
     public FavouriteAdapter(List<JsonData> dataList, OnLocationClicked clicked) {
         mData = dataList;
@@ -63,6 +65,12 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
             holder.mAirStatus.setText(R.string.hazardous);
             holder.mDesc.setText(R.string.desc_hazardous);
         }
+        if (position > prevPosition){
+            AnimatorUtil.animate(holder,true);
+        }else{
+            AnimatorUtil.animate(holder,false);
+        }
+        prevPosition = position;
 
     }
     public interface OnLocationClicked{
