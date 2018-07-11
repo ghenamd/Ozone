@@ -36,6 +36,7 @@ import com.example.android.ozone.utils.AppExecutors;
 import com.example.android.ozone.utils.Helper;
 import com.example.android.ozone.utils.OzoneConstants;
 import com.example.android.ozone.viewModel.MainViewModel;
+import com.example.android.ozone.widget.OzoneWidgetIntentService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -47,6 +48,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -69,6 +71,7 @@ public class LocationFragment extends Fragment {
     @BindView(R.id.relativeLayout)
     RelativeLayout mRelativeLayout;
     private FusedLocationProviderClient mFusedLocationClient;
+    public static List<JsonData> favData = new ArrayList<>();
 
     public LocationFragment() {
         // Required empty public constructor
@@ -204,6 +207,8 @@ public class LocationFragment extends Fragment {
                 }
             }
         });
+        favData = viewModel.getDataList();
+        OzoneWidgetIntentService.startUpdateOzoneWidget(getActivity().getBaseContext());
     }
 
 

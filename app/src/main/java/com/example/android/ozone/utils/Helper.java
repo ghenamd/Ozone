@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Helper {
-
+    private static final String TAG = "Helper";
     public static JsonData getLastListItem(List<JsonData> data) {
         int n = data.size();
         if (n != 0) {
@@ -50,4 +50,5 @@ public class Helper {
     public static void showToastDeleted(Context context, String city){
         Toast.makeText(context, city+ " deleted", Toast.LENGTH_SHORT).show();
     }
+
 }

@@ -2,7 +2,6 @@ package com.example.android.ozone.widget;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -11,11 +10,12 @@ import com.example.android.ozone.model.JsonData;
 
 import java.util.List;
 
-import static com.example.android.ozone.ui.view.fragment.FavouriteFragment.favData;
+import static com.example.android.ozone.ui.view.fragment.LocationFragment.favData;
 
 public class OzoneRemoteViewService extends RemoteViewsService {
-    private static final String TAG = "OzoneRemoteViewService";
-
+public static final String TEMP= "Temp ";
+public static final String AQI= "Aqi ";
+public static final String CELSIUS= "C";
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         return new OzoneRemoteViewsFactory(this.getApplicationContext());
@@ -57,32 +57,28 @@ public class OzoneRemoteViewService extends RemoteViewsService {
         }
 
         @Override
-        public RemoteViews getViewAt(int i) {
-            return null;
+        public RemoteViews getViewAt(int position) {
+            RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.item_widget);
+            JsonData data = mDataList.get(position);
+            views.setTextViewText(R.id.widget_place, data.getCity());
+            views.setTextViewText(R.id.widget_aqi, AQI+ String.valueOf(data.getAqius()));
+            views.setTextViewText(R.id.widget_temperature, TEMP + String.valueOf(data.getTp()) + CELSIUS);
+            return views;
         }
 
         @Override
         public RemoteViews getLoadingView() {
-            RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.item_widget);
-            for (JsonData data: mDataList) {
-                views.setTextViewText(R.id.widget_place, data.getCity());
-                Log.d(TAG, "getLoadingView: " + data.getCity());
-                views.setTextViewText(R.id.widget_aqi, String.valueOf(data.getAqius()));
-                views.setTextViewText(R.id.widget_temperature, String.valueOf(data.getTp()));
-
-            }
-            return views;
-
+            return null;
         }
 
         @Override
         public int getViewTypeCount() {
-            return 0;
+            return 1;
         }
 
         @Override
         public long getItemId(int i) {
-            return 0;
+            return i;
         }
 
         @Override
@@ -91,5 +87,6 @@ public class OzoneRemoteViewService extends RemoteViewsService {
         }
 
     }
+
 
 }

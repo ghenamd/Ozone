@@ -1,4 +1,4 @@
-package com.example.android.ozone;
+package com.example.android.ozone.ui.view;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.example.android.ozone.R;
 import com.example.android.ozone.ui.view.fragment.FavouriteFragment;
 import com.example.android.ozone.ui.view.fragment.LocationFragment;
 import com.example.android.ozone.ui.view.fragment.MapsFragment;

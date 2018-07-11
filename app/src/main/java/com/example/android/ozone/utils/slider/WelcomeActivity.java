@@ -18,7 +18,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.android.ozone.MainActivity;
+import com.example.android.ozone.ui.view.MainActivity;
 import com.example.android.ozone.R;
 
 public class WelcomeActivity extends AppCompatActivity {

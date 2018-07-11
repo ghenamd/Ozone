@@ -18,14 +18,13 @@ import android.widget.TextView;
 
 import com.example.android.ozone.R;
 import com.example.android.ozone.data.AppDatabase;
-import com.example.android.ozone.ui.view.dialog.DetailsDialog;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.ui.view.adapter.FavouriteAdapter;
+import com.example.android.ozone.ui.view.dialog.DetailsDialog;
 import com.example.android.ozone.utils.AppExecutors;
 import com.example.android.ozone.utils.Helper;
 import com.example.android.ozone.utils.OzoneConstants;
 import com.example.android.ozone.viewModel.MainViewModel;
-import com.example.android.ozone.widget.OzoneWidgetIntentService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +43,6 @@ public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLo
     TextView noFavText;
     private AppDatabase mDatabase;
     private FavouriteAdapter mFavouriteAdapter;
-    public static List<JsonData> favData = new ArrayList<>();
 
     public FavouriteFragment() {
         // Required empty public constructor
@@ -76,7 +74,6 @@ public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLo
             }
         });
         setupViewModel();
-        OzoneWidgetIntentService.startUpdateOzoneWidget(getActivity().getBaseContext());
         deletePlace();
         return view;
     }
@@ -94,8 +91,6 @@ public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLo
                 }
             }
         });
-
-        favData = viewModel.getDataList();
 
     }
 
