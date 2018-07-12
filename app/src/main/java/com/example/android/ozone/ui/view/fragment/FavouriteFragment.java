@@ -25,6 +25,7 @@ import com.example.android.ozone.utils.AppExecutors;
 import com.example.android.ozone.utils.Helper;
 import com.example.android.ozone.utils.OzoneConstants;
 import com.example.android.ozone.viewModel.MainViewModel;
+import com.example.android.ozone.widget.OzoneWidgetIntentService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLo
     TextView noFavText;
     private AppDatabase mDatabase;
     private FavouriteAdapter mFavouriteAdapter;
-
+    public static List<JsonData> favData = new ArrayList<>();
     public FavouriteFragment() {
         // Required empty public constructor
     }
@@ -75,6 +76,7 @@ public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLo
         });
         setupViewModel();
         deletePlace();
+        OzoneWidgetIntentService.startUpdateOzoneWidget(getActivity().getBaseContext());
         return view;
     }
 
@@ -84,6 +86,7 @@ public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLo
             @Override
             public void onChanged(@Nullable List<JsonData> jsonData) {
                 if ((jsonData != null)) {
+                    favData = jsonData;
                     populateUi(jsonData);
                 } else {
                     noFavText.setVisibility(View.VISIBLE);

@@ -34,10 +34,9 @@
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service android:name=".network.MapsIntentService" />
         <service android:name=".ui.view.dialog.MarkerDialog" />
-
-        <service android:name=".widget.OzoneRemoteViewService"
-            android:permission="android.permission.BIND_REMOTEVIEWS"/>
-
+        <service
+            android:name=".widget.OzoneRemoteViewService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
         <service android:name=".widget.OzoneWidgetIntentService" />
 
         <meta-data
@@ -47,9 +46,9 @@
         <activity
             android:name=".ui.view.dialog.MarkerDialog"
             android:theme="@style/Theme.AppCompat.Dialog" />
-        <activity android:name=".ui.view.dialog.DetailsDialog"
-            android:theme="@style/Theme.AppCompat.Dialog"/>
-
+        <activity
+            android:name=".ui.view.dialog.DetailsDialog"
+            android:theme="@style/Theme.AppCompat.Dialog" />
 
         <receiver android:name=".widget.OzoneWidget">
             <intent-filter>
@@ -60,6 +59,8 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/ozone_widget_info" />
         </receiver>
+
+        <activity android:name=".ui.view.settings.SettingsActivity"></activity>
     </application>
 
 </manifest>

@@ -56,6 +56,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="91dp"
                 android:textColor="@android:color/white"
+                tools:text="12"
                 android:textSize="36sp" />
 
             <TextView
@@ -81,6 +82,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="2dp"
+                tools:text="Belvedere"
                 android:textAppearance="@android:style/TextAppearance.Small"
                 android:textColor="@color/gray" />
 
@@ -132,6 +134,16 @@
                     style="@style/text_icon" />
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/aqi_us_cn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textSize="@dimen/roboto_reg_10"
+                android:padding="3dp"
+                android:textColor="@android:color/white"
+                tools:text="Us" />
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>

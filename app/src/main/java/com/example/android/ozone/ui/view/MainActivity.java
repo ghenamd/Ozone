@@ -1,5 +1,6 @@
 package com.example.android.ozone.ui.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -14,6 +15,7 @@ import com.example.android.ozone.R;
 import com.example.android.ozone.ui.view.fragment.FavouriteFragment;
 import com.example.android.ozone.ui.view.fragment.LocationFragment;
 import com.example.android.ozone.ui.view.fragment.MapsFragment;
+import com.example.android.ozone.ui.view.settings.SettingsActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(R.string.location);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -33,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigationView = findViewById(R.id.navigation);
         navigationView.setOnNavigationItemSelectedListener(mBottomNavigationView);
     }
+
     private BottomNavigationView.OnNavigationItemSelectedListener mBottomNavigationView = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
@@ -79,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.app_bar_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 break;

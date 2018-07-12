@@ -14,5 +14,6 @@ public class OzoneConstants {
     public static final String LON_MAP = "lon_map";
     public static final String LOCATION = "location";
     public static final String DETAILS = "details";
+    public static final String WIDGET = "Widget";
 
 }

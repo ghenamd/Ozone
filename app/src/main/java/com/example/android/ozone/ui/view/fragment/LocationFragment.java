@@ -48,7 +48,6 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -71,7 +70,6 @@ public class LocationFragment extends Fragment {
     @BindView(R.id.relativeLayout)
     RelativeLayout mRelativeLayout;
     private FusedLocationProviderClient mFusedLocationClient;
-    public static List<JsonData> favData = new ArrayList<>();
 
     public LocationFragment() {
         // Required empty public constructor
@@ -84,7 +82,7 @@ public class LocationFragment extends Fragment {
         ButterKnife.bind(this, view);
         setRetainInstance(true);
         mDb = AppDatabase.getInstance(getActivity());
-        mAdapter = new LocationAdapter(new JsonData());
+        mAdapter = new LocationAdapter(new JsonData(),getActivity());
         if (Helper.isConnected(getActivity())) {
             mProgressBar.setVisibility(View.VISIBLE);
             initPermissions();
@@ -110,6 +108,7 @@ public class LocationFragment extends Fragment {
             }
         });
         setupViewModel();
+        OzoneWidgetIntentService.startUpdateOzoneWidget(getActivity().getBaseContext());
         return view;
     }
 
@@ -197,6 +196,7 @@ public class LocationFragment extends Fragment {
             @Override
             public void onChanged(@Nullable List<JsonData> jsonData) {
                 if ((jsonData != null && jsonData.size() > 0)) {
+
                     JsonData jd = Helper.getLastListItem(jsonData);
                     if (jd != null) {
                         Helper.populateUi(jd,getActivity().getBaseContext(),
@@ -207,8 +207,7 @@ public class LocationFragment extends Fragment {
                 }
             }
         });
-        favData = viewModel.getDataList();
-        OzoneWidgetIntentService.startUpdateOzoneWidget(getActivity().getBaseContext());
+
     }
 
 

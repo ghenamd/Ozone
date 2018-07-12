@@ -10,12 +10,13 @@ import com.example.android.ozone.model.JsonData;
 
 import java.util.List;
 
-import static com.example.android.ozone.ui.view.fragment.LocationFragment.favData;
+import static com.example.android.ozone.ui.view.fragment.FavouriteFragment.favData;
 
 public class OzoneRemoteViewService extends RemoteViewsService {
 public static final String TEMP= "Temp ";
 public static final String AQI= "Aqi ";
 public static final String CELSIUS= "C";
+
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         return new OzoneRemoteViewsFactory(this.getApplicationContext());
@@ -39,6 +40,7 @@ public static final String CELSIUS= "C";
 
         @Override
         public void onDataSetChanged() {
+
             mDataList = favData;
         }
 
@@ -59,6 +61,7 @@ public static final String CELSIUS= "C";
         @Override
         public RemoteViews getViewAt(int position) {
             RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.item_widget);
+
             JsonData data = mDataList.get(position);
             views.setTextViewText(R.id.widget_place, data.getCity());
             views.setTextViewText(R.id.widget_aqi, AQI+ String.valueOf(data.getAqius()));

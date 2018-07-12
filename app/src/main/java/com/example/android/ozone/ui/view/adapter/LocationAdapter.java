@@ -1,6 +1,9 @@
 package com.example.android.ozone.ui.view.adapter;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,55 +22,95 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
+public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "LocationAdapter";
     private JsonData mData;
+    private Context mContext;
+    private LocationAdapter.ViewHolder holder;
 
-    public LocationAdapter(JsonData data) {
-        mData =data;
+    public LocationAdapter(JsonData data, Context context) {
+        mData = data;
+        mContext = context;
+
 
     }
 
     @NonNull
     @Override
     public LocationAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_location,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_location, parent, false);
         return new LocationAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull LocationAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull LocationAdapter.ViewHolder hold, int position) {
+        holder = hold;
         holder.aqiNumber.setText(String.valueOf(mData.getAqius()));
         holder.city.setText(mData.getCity());
-        holder.country.setText(mData.getState() +", " +mData.getCountry());
-        holder.humidityPercentage.setText(String.valueOf(mData.getHu()+ "%"));
+        holder.country.setText(mData.getState() + ", " + mData.getCountry());
+        holder.humidityPercentage.setText(String.valueOf(mData.getHu() + "%"));
         holder.windSpeed.setText(String.valueOf(mData.getWs() + "m/s"));
         holder.temperature.setText(String.valueOf(mData.getTp() + "C"));
         holder.date.setText(formatDate(mData.getTs()));
-       //holder.date.setText(formatDate(mData.getTs()));
-        if (mData.getAqius() <= 50){
-            holder.circleView.setImageResource(R.drawable.green_circle);
-            holder.airCondition.setText(R.string.good);
-            holder.airDescription.setText(R.string.desc_good);
-        }else if (mData.getAqius()>50&&mData.getAqius()<=100){
-            holder.circleView.setImageResource(R.drawable.yellow_circle);
-            holder.airCondition.setText(R.string.moderate);
-            holder.airDescription.setText(R.string.desc_moderate);
-        }else if (mData.getAqius()>100 && mData.getAqius()<=150){
-            holder.circleView.setImageResource(R.drawable.orange_circle);
-            holder.airCondition.setText(R.string.unhealthy);
-            holder.airDescription.setText(R.string.desc_unhealthy);
-        }else if (mData.getAqius()>150 && mData.getAqius()<=200){
-            holder.circleView.setImageResource(R.drawable.red_circle);
-            holder.airCondition.setText(R.string.unhealthy);
-            holder.airDescription.setText(R.string.desc_unhealthy);
-        }else if (mData.getAqius()>200 && mData.getAqius()<=300){
-            holder.circleView.setImageResource(R.drawable.purple_circle);
-            holder.airCondition.setText(R.string.very_unhealthy);
-        }else if (mData.getAqius()>300 && mData.getAqius()<=500){
-            holder.circleView.setImageResource(R.drawable.maroon_circle);
-            holder.airCondition.setText(R.string.hazardous);
-            holder.airDescription.setText(R.string.desc_hazardous);
+        setAqiValue(mData, hold);
+
+    }
+
+    private void setAqiValue(JsonData jsonData, LocationAdapter.ViewHolder holder) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String aqiValue = sharedPreferences.getString("Aqi", "Us");
+        if (aqiValue.equals("Us")) {
+            holder.mAqiUsCn.setText(R.string.us_lable_aqi);
+            if (jsonData.getAqius() <= 50) {
+                holder.circleView.setImageResource(R.drawable.green_circle);
+                holder.airCondition.setText(R.string.good);
+                holder.airDescription.setText(R.string.desc_good);
+            } else if (jsonData.getAqius() > 50 && jsonData.getAqius() <= 100) {
+                holder.circleView.setImageResource(R.drawable.yellow_circle);
+                holder.airCondition.setText(R.string.moderate);
+                holder.airDescription.setText(R.string.desc_moderate);
+            } else if (jsonData.getAqius() > 100 && jsonData.getAqius() <= 150) {
+                holder.circleView.setImageResource(R.drawable.orange_circle);
+                holder.airCondition.setText(R.string.unhealthy);
+                holder.airDescription.setText(R.string.desc_unhealthy);
+            } else if (jsonData.getAqius() > 150 && jsonData.getAqius() <= 200) {
+                holder.circleView.setImageResource(R.drawable.red_circle);
+                holder.airCondition.setText(R.string.unhealthy);
+                holder.airDescription.setText(R.string.desc_unhealthy);
+            } else if (jsonData.getAqius() > 200 && jsonData.getAqius() <= 300) {
+                holder.circleView.setImageResource(R.drawable.purple_circle);
+                holder.airCondition.setText(R.string.very_unhealthy);
+            } else if (jsonData.getAqius() > 300 && jsonData.getAqius() <= 500) {
+                holder.circleView.setImageResource(R.drawable.maroon_circle);
+                holder.airCondition.setText(R.string.hazardous);
+                holder.airDescription.setText(R.string.desc_hazardous);
+            }
+        } else if (aqiValue.equals("Cn")) {
+            holder.mAqiUsCn.setText(R.string.cn_lable_aqi);
+            if (jsonData.getAqicn() <= 50) {
+                holder.circleView.setImageResource(R.drawable.green_circle);
+                holder.airCondition.setText(R.string.good);
+                holder.airDescription.setText(R.string.desc_good);
+            } else if (jsonData.getAqicn() > 50 && jsonData.getAqicn() <= 100) {
+                holder.circleView.setImageResource(R.drawable.yellow_circle);
+                holder.airCondition.setText(R.string.moderate);
+                holder.airDescription.setText(R.string.desc_moderate);
+            } else if (jsonData.getAqicn() > 100 && jsonData.getAqicn() <= 150) {
+                holder.circleView.setImageResource(R.drawable.orange_circle);
+                holder.airCondition.setText(R.string.unhealthy);
+                holder.airDescription.setText(R.string.desc_unhealthy);
+            } else if (jsonData.getAqicn() > 150 && jsonData.getAqicn() <= 200) {
+                holder.circleView.setImageResource(R.drawable.red_circle);
+                holder.airCondition.setText(R.string.unhealthy);
+                holder.airDescription.setText(R.string.desc_unhealthy);
+            } else if (jsonData.getAqicn() > 200 && jsonData.getAqicn() <= 300) {
+                holder.circleView.setImageResource(R.drawable.purple_circle);
+                holder.airCondition.setText(R.string.very_unhealthy);
+            } else if (jsonData.getAqicn() > 300 && jsonData.getAqicn() <= 500) {
+                holder.circleView.setImageResource(R.drawable.maroon_circle);
+                holder.airCondition.setText(R.string.hazardous);
+                holder.airDescription.setText(R.string.desc_hazardous);
+            }
         }
     }
 
@@ -75,13 +118,26 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
     public int getItemCount() {
         return 1;
     }
-    public JsonData getCurrentLocation(){return mData;}
-    public void addData(JsonData data){
+
+    public JsonData getCurrentLocation() {
+        return mData;
+    }
+
+    public void addData(JsonData data) {
         mData = data;
         notifyDataSetChanged();
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+     if (s.equals("Aqi")){
+         setAqiValue(mData,holder);
+     }
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.aqi_us_cn)
+        TextView mAqiUsCn;
         @BindView(R.id.air_condition)
         TextView airCondition;
         @BindView(R.id.circleView)
@@ -111,18 +167,21 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
 
         public ViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this,itemView);
+            ButterKnife.bind(this, itemView);
         }
     }
-    private  String formatDate(String str)  {
+
+    private String formatDate(String str) {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.UK);
-        SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MM-yyyy",Locale.UK);
+        SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.UK);
         Date date = null;
         try {
             date = inputFormat.parse(str);
         } catch (ParseException e) {
+
             e.printStackTrace();
         }
         return outputFormat.format(date);
     }
+
 }

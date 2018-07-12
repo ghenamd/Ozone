@@ -1,5 +1,6 @@
 package com.example.android.ozone.widget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
@@ -7,6 +8,8 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 import com.example.android.ozone.R;
+import com.example.android.ozone.ui.view.MainActivity;
+import com.example.android.ozone.utils.OzoneConstants;
 
 /**
  * Implementation of App Widget functionality.
@@ -19,6 +22,11 @@ public class OzoneWidget extends AppWidgetProvider {
 
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ozone_widget);
+
+        Intent click = new Intent(context, MainActivity.class);
+        click.putExtra(OzoneConstants.WIDGET,1);
+        PendingIntent appPendingIntent = PendingIntent.getActivity(context,0,click,PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setOnClickPendingIntent(R.id.widget_title,appPendingIntent);
 
         Intent intent = new Intent(context, OzoneRemoteViewService.class);
         views.setRemoteAdapter(R.id.widget_list_view, intent);

@@ -49,6 +49,12 @@
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
     <string name="no_favorite_places">No favorite places</string>
+    <string name="pref_aqi_key">Aqi</string>
+    <string name="pref_aqi_title">Aqi</string>
+    <string name="air_quality_index_dialog_title">Air quality index</string>
+    <string name="pref_us">Us</string>
+    <string name="us_lable_aqi">US</string>
+    <string name="cn_lable_aqi">CN</string>
 
 
 </resources>
