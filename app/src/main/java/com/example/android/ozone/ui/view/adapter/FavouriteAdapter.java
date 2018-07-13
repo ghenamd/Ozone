@@ -1,5 +1,8 @@
 package com.example.android.ozone.ui.view.adapter;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,10 +23,13 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
     private List<JsonData> mData;
     private OnLocationClicked mLocationClicked;
     int prevPosition = 0;
+    private Context mContext;
+    public static final String AQI = "Aqi-";
 
-    public FavouriteAdapter(List<JsonData> dataList, OnLocationClicked clicked) {
+    public FavouriteAdapter(List<JsonData> dataList, OnLocationClicked clicked, Context context) {
         mData = dataList;
         mLocationClicked = clicked;
+        mContext = context;
     }
 
     @NonNull
@@ -35,15 +41,38 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String aqiValue = pref.getString("Aqi","Us");
         JsonData jsonData = mData.get(position);
         String city = jsonData.getCity();
-        int aqi = jsonData.getAqius();
+
         int temp = jsonData.getTp();
-        holder.mAqi.setText("Aqi " +String.valueOf(aqi));
         holder.mCity.setText(city);
         holder.mTemp.setText(String.valueOf(temp) + "C");
-        if (aqi <= 50){
+        int aqi;
+        if (aqiValue.equals("Us")){
+            aqi = jsonData.getAqius();
+            holder.mAqi.setText(AQI +String.valueOf(aqi));
+            setViewHolder(aqi,holder);
+        }else if (aqiValue.equals("Cn")){
+            aqi = jsonData.getAqicn();
+            holder.mAqi.setText(AQI +String.valueOf(aqi));
+            setViewHolder(aqi,holder);
+        }
 
+        if (position > prevPosition){
+            AnimatorUtil.animate(holder,true);
+        }else{
+            AnimatorUtil.animate(holder,false);
+        }
+        prevPosition = position;
+
+    }
+    public interface OnLocationClicked{
+        void onItemClicked(JsonData data);
+    }
+    private void setViewHolder(int aqi,ViewHolder holder){
+        if (aqi <= 50){
             holder.mAirStatus.setText(R.string.good);
             holder.mDesc.setText(R.string.desc_good);
         }else if (aqi > 50 && aqi <=100){
@@ -65,16 +94,7 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
             holder.mAirStatus.setText(R.string.hazardous);
             holder.mDesc.setText(R.string.desc_hazardous);
         }
-        if (position > prevPosition){
-            AnimatorUtil.animate(holder,true);
-        }else{
-            AnimatorUtil.animate(holder,false);
-        }
-        prevPosition = position;
 
-    }
-    public interface OnLocationClicked{
-        void onItemClicked(JsonData data);
     }
 
     @Override

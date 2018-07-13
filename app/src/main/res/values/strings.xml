@@ -53,8 +53,8 @@
     <string name="pref_aqi_title">Aqi</string>
     <string name="air_quality_index_dialog_title">Air quality index</string>
     <string name="pref_us">Us</string>
-    <string name="us_lable_aqi">US</string>
-    <string name="cn_lable_aqi">CN</string>
+    <string name="us_lable_aqi">Us</string>
+    <string name="cn_lable_aqi">Cn</string>
 
 
 </resources>

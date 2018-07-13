@@ -26,7 +26,7 @@ public class DetailsDialog extends AppCompatActivity {
         LinearLayoutManager manager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(manager);
         mRecyclerView.setHasFixedSize(true);
-        DetailsDialogAdapter adapter = new DetailsDialogAdapter(dt);
+        DetailsDialogAdapter adapter = new DetailsDialogAdapter(dt,this);
         mRecyclerView.setAdapter(adapter);
     }
 }

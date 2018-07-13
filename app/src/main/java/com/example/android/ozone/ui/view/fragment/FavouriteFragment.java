@@ -124,7 +124,7 @@ public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLo
 
     //Helper method to populate the Ui
     private void populateUi(List<JsonData> data) {
-        mFavouriteAdapter = new FavouriteAdapter(new ArrayList<JsonData>(),this);
+        mFavouriteAdapter = new FavouriteAdapter(new ArrayList<JsonData>(),this,getActivity());
         LinearLayoutManager manager = new LinearLayoutManager(getActivity().getBaseContext());
         mFavouriteAdapter.addData(data);
         mRecyclerView.setHasFixedSize(true);

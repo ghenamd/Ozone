@@ -22,7 +22,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder>  {
     private static final String TAG = "LocationAdapter";
     private JsonData mData;
     private Context mContext;
@@ -53,9 +53,11 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
         holder.temperature.setText(String.valueOf(mData.getTp() + "C"));
         holder.date.setText(formatDate(mData.getTs()));
         setAqiValue(mData, hold);
+        setWeatherConditionLogo(mData,hold);
+
 
     }
-
+    //Helper method to change textViews content depending on Aqi value
     private void setAqiValue(JsonData jsonData, LocationAdapter.ViewHolder holder) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         String aqiValue = sharedPreferences.getString("Aqi", "Us");
@@ -113,6 +115,50 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
             }
         }
     }
+    //Helper method to change weatherLogo depending on server reply
+    private void setWeatherConditionLogo(JsonData jsonData, LocationAdapter.ViewHolder holder){
+        String weatherCondLogo = jsonData.getIc();
+        switch (weatherCondLogo) {
+            case "01d":
+                holder.weatherCondition.setImageResource(R.drawable.d01);
+                break;
+            case "01n":
+                holder.weatherCondition.setImageResource(R.drawable.n01);
+                break;
+            case "02d":
+                holder.weatherCondition.setImageResource(R.drawable.d02);
+                break;
+            case "02n":
+                holder.weatherCondition.setImageResource(R.drawable.n02);
+                break;
+            case "03d":
+                holder.weatherCondition.setImageResource(R.drawable.d03);
+                break;
+            case "04d":
+                holder.weatherCondition.setImageResource(R.drawable.d04);
+                break;
+            case "09d":
+                holder.weatherCondition.setImageResource(R.drawable.d09);
+                break;
+            case "10d":
+                holder.weatherCondition.setImageResource(R.drawable.d10);
+                break;
+            case "10n":
+                holder.weatherCondition.setImageResource(R.drawable.n10);
+                break;
+            case "11d":
+                holder.weatherCondition.setImageResource(R.drawable.d11);
+                break;
+            case "13d":
+                holder.weatherCondition.setImageResource(R.drawable.d13);
+                break;
+            case "50d":
+                holder.weatherCondition.setImageResource(R.drawable.d50);
+                break;
+            default:holder.weatherCondition.setImageResource(R.drawable.d01);
+                break;
+        }
+    }
 
     @Override
     public int getItemCount() {
@@ -126,13 +172,6 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
     public void addData(JsonData data) {
         mData = data;
         notifyDataSetChanged();
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-     if (s.equals("Aqi")){
-         setAqiValue(mData,holder);
-     }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

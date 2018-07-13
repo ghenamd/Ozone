@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,10 +72,19 @@ public class LocationFragment extends Fragment {
     @BindView(R.id.relativeLayout)
     RelativeLayout mRelativeLayout;
     private FusedLocationProviderClient mFusedLocationClient;
+    private SharedPreferences mPreferences;
 
     public LocationFragment() {
         // Required empty public constructor
     }
+    SharedPreferences.OnSharedPreferenceChangeListener mListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            if (key.equals("Aqi")){
+                setupViewModel();
+            }
+        }
+    };
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -81,6 +92,8 @@ public class LocationFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_location, container, false);
         ButterKnife.bind(this, view);
         setRetainInstance(true);
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mPreferences.registerOnSharedPreferenceChangeListener(mListener);
         mDb = AppDatabase.getInstance(getActivity());
         mAdapter = new LocationAdapter(new JsonData(),getActivity());
         if (Helper.isConnected(getActivity())) {
@@ -224,8 +237,6 @@ public class LocationFragment extends Fragment {
     -------------------------------Helper Methods --------------------------------------------------
      */
 
-
-
     @Override
     public void onResume() {
         super.onResume();
@@ -237,8 +248,8 @@ public class LocationFragment extends Fragment {
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
-    }
-    //Helper method to get the first item in the list
+        mPreferences.unregisterOnSharedPreferenceChangeListener(mListener);
 
+    }
 
 }
