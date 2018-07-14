@@ -2,6 +2,7 @@ package com.example.android.ozone.utils;
 
 public class OzoneConstants {
     public static final String AIR_VISUAL_API = "https://api.airvisual.com/v2/nearest_city?";
+    public static final String AIR_VISUAL_API_CITY = "https://api.airvisual.com/v2/city?";
     public static final String API_KEY = "7AT8CRu94YJ5uXZFN";
     public static final String PARAM_LAT = "lat";
     public static final String PARAM_LON = "lon";
@@ -15,5 +16,8 @@ public class OzoneConstants {
     public static final String LOCATION = "location";
     public static final String DETAILS = "details";
     public static final String WIDGET = "Widget";
+    public static final String CITY = "city";
+    public static final String STATE = "state";
+    public static final String COUNTRY = "country";
 
 }

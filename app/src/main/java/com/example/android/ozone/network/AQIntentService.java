@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.utils.OzoneConstants;
@@ -31,7 +30,6 @@ public class AQIntentService extends JobIntentService {
         String lat = String.valueOf(bundle.getDouble(OzoneConstants.LAT));
         String lon = String.valueOf(bundle.getDouble(OzoneConstants.LON));
         URL url = FetchData.createUrl(String.valueOf(lat),String.valueOf(lon));
-        Log.d(TAG, url.toString());
         String reply=null;
         try {
             reply = FetchData.getResponseFromHttpUrl(url);

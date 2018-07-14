@@ -26,15 +26,17 @@ public class Helper {
             return null;
         }
     }
+
     //Helper method to check if there is Internet connection
     public static boolean isConnected(Context context) {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = Objects.requireNonNull(manager).getActiveNetworkInfo();
         return info != null && info.isConnectedOrConnecting();
     }
+
     //Helper method to populate the UI
     public static void populateUi(JsonData jsonData, Context context,
-                            LocationAdapter adapter, RecyclerView recyclerView, ProgressBar bar) {
+                                  LocationAdapter adapter, RecyclerView recyclerView, ProgressBar bar) {
         LinearLayoutManager manager = new LinearLayoutManager(context);
         adapter.addData(jsonData);
         recyclerView.setLayoutManager(manager);
@@ -44,11 +46,14 @@ public class Helper {
         bar.setVisibility(View.INVISIBLE);
     }
 
-    public static void showToastInserted(Context context, String city){
+    public static void showToastInserted(Context context, String city) {
         Toast.makeText(context, city + " added", Toast.LENGTH_SHORT).show();
     }
-    public static void showToastDeleted(Context context, String city){
-        Toast.makeText(context, city+ " deleted", Toast.LENGTH_SHORT).show();
+
+    public static void showToastDeleted(Context context, String city) {
+        Toast.makeText(context, city + " deleted", Toast.LENGTH_SHORT).show();
     }
+
+
 
 }

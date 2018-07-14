@@ -12,10 +12,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.example.android.ozone.R;
+import com.example.android.ozone.sync.OzoneFireBaseJobDispatcher;
 import com.example.android.ozone.ui.view.fragment.FavouriteFragment;
 import com.example.android.ozone.ui.view.fragment.LocationFragment;
 import com.example.android.ozone.ui.view.fragment.MapsFragment;
 import com.example.android.ozone.ui.view.settings.SettingsActivity;
+import com.example.android.ozone.utils.notification.NotificationUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
         BottomNavigationView navigationView = findViewById(R.id.navigation);
         navigationView.setOnNavigationItemSelectedListener(mBottomNavigationView);
+        //Initialize FirebaseJobDispatcherSync
+        OzoneFireBaseJobDispatcher.initialize(this);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mBottomNavigationView = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -86,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.notif:
+                NotificationUtils.showNotificationAfterUpdate(this);
             default:
                 break;
         }

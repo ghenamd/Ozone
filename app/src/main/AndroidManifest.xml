@@ -32,12 +32,12 @@
         <service
             android:name=".network.AQIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service android:name=".network.MapsIntentService" />
         <service android:name=".ui.view.dialog.MarkerDialog" />
         <service
             android:name=".widget.OzoneRemoteViewService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
         <service android:name=".widget.OzoneWidgetIntentService" />
+        <service android:name=".sync.OzoneJobDispatcher" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

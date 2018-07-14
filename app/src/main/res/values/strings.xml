@@ -55,6 +55,8 @@
     <string name="pref_us">Us</string>
     <string name="us_lable_aqi">Us</string>
     <string name="cn_lable_aqi">Cn</string>
+    <string name="ozone_notification">Ozone Notification</string>
+    <string name="data_updated">Data updated</string>
 
 
 </resources>
