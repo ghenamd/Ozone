@@ -1,24 +1,21 @@
-package com.example.android.ozone.ui.view.fragment;
-
+package com.example.android.ozone.ui.view;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
@@ -28,10 +25,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.ozone.R;
-import com.example.android.ozone.ui.view.dialog.MarkerDialog;
 import com.example.android.ozone.model.PlaceInfo;
+import com.example.android.ozone.ui.view.dialog.MarkerDialog;
+import com.example.android.ozone.ui.view.settings.SettingsActivity;
 import com.example.android.ozone.utils.OzoneConstants;
 import com.example.android.ozone.utils.PlaceAutocompleteAdapter;
+import com.example.android.ozone.utils.notification.NotificationUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -56,66 +55,93 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
     @BindView(R.id.text_search_bar)
     AutoCompleteTextView mCompleteTextView;
     @BindView(R.id.gps_icon)
     ImageView mGpsIcon;
     private FusedLocationProviderClient mFusedLocationClient;
     private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
+    private static final String TAG = "MapActivity";
     private GoogleMap mMap;
-    private SupportMapFragment mMapFragment;
-    private static final String TAG = "MapsFragment";
     private static final float ZOOM = 10f;
-    private static final LatLngBounds LAT_LNG_BOUNDS =
-            new LatLngBounds(new LatLng(49.38, -17.39), new LatLng(59.53, 8.96));
+    private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(49.38, -17.39), new LatLng(59.53, 8.96));
     private GoogleApiClient mGoogleApiClient;
     private Marker mMarker;
     private PlaceInfo mPlace;
-
-    public MapsFragment() {
-        // Required empty public constructor
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_maps, container, false);
-        ButterKnife.bind(this, view);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activiy_maps);
+        ButterKnife.bind(this);
+        initMap();
         initGoogleApi();
-        mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        if (mMapFragment == null) {
-            FragmentManager fm = getFragmentManager();
-            FragmentTransaction ft = fm.beginTransaction();
-            mMapFragment = SupportMapFragment.newInstance();
-            ft.replace(R.id.map, mMapFragment).commit();
+        BottomNavigationView navigationView = findViewById(R.id.navigation);
+        navigationView.setOnNavigationItemSelectedListener(mBottomNavigationView);
+
+    }
+    private BottomNavigationView.OnNavigationItemSelectedListener mBottomNavigationView = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.current_location:
+                    Intent locationIntent = new Intent(MapActivity.this,LocationActivity.class);
+                    startActivity(locationIntent);
+                    break;
+                case R.id.favourite:
+                    Intent favouriteIntent = new Intent(MapActivity.this,FavouriteActivity.class);
+                    startActivity(favouriteIntent);
+                    break;
+            }
+            return false;
         }
-        mMapFragment.getMapAsync(this);
-        // Inflate the layout for this fragment
-        return view;
+    };
+    private void initMap(){
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(MapActivity.this);
     }
 
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Toast.makeText(getActivity(),"Map is ready",Toast.LENGTH_SHORT).show();
+        Toast.makeText(MapActivity.this,"Map is ready",Toast.LENGTH_SHORT).show();
         mMap = googleMap;
-        if (isConnected()) {
-            googleMap.setMyLocationEnabled(true);
-        }
-        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
         init();
 
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_app_bar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.app_bar_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.notif:
+                NotificationUtils.showNotificationAfterUpdate(this);
+            default:
+                break;
+        }
+        return false;
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(getActivity(),R.string.please_check_your_intenet_connection,Toast.LENGTH_SHORT).show();
+        Toast.makeText(MapActivity.this,R.string.please_check_your_intenet_connection,Toast.LENGTH_SHORT).show();
     }
 
     private void init() {
@@ -143,25 +169,25 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
     //Hides the keyboard
     private void hideKeyboard() {
-        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
     private void initGoogleApi() {
         //Initialize GoogleApiClient to create a new PlaceAutoCompleteAdapter
         mGoogleApiClient = new GoogleApiClient
-                .Builder(getActivity())
+                .Builder(this)
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
-                .enableAutoManage(getActivity(), this)
+                .enableAutoManage(this, this)
                 .build();
-        mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(getActivity(),
+        mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(this,
                 mGoogleApiClient, LAT_LNG_BOUNDS, null);
     }
 
     //Method to get the typed string and find the location.
     private void locatePlace() {
         String loc = mCompleteTextView.getText().toString();
-        Geocoder geocoder = new Geocoder(getActivity());
+        Geocoder geocoder = new Geocoder(this);
         List<Address> addressList = new ArrayList<>();
         try {
             addressList = geocoder.getFromLocationName(loc, 1);
@@ -191,7 +217,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Intent intent = new Intent(getActivity(), MarkerDialog.class);
+                Intent intent = new Intent(MapActivity.this, MarkerDialog.class);
                 Bundle bundle =  new Bundle();
                 bundle.putString(OzoneConstants.LOCATION,marker.getTitle());
                 bundle.putDouble(OzoneConstants.LAT_MAP, marker.getPosition().latitude);
@@ -205,31 +231,23 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         hideKeyboard();
     }
 
-
-    //Helper method to check if there is Internet connection
-    private boolean isConnected() {
-        ConnectivityManager manager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = Objects.requireNonNull(manager).getActiveNetworkInfo();
-        return info != null && info.isConnectedOrConnecting();
-    }
-
     //Call it else we get a "Already managing a GoogleApiClient with id 0" error
     @Override
     public void onPause() {
         super.onPause();
-        mGoogleApiClient.stopAutoManage(getActivity());
+        mGoogleApiClient.stopAutoManage(this);
         mGoogleApiClient.disconnect();
     }
 
     /*
-     ----------------------find device location using FusedLocationProviderClient------------
+     ----------------------Find device location using FusedLocationProviderClient------------
      */
     @SuppressLint("MissingPermission")
     private void getDeviceLocation() {
         mFusedLocationClient = LocationServices.
-                getFusedLocationProviderClient(getActivity().getApplicationContext());
+                getFusedLocationProviderClient(this.getApplicationContext());
         mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.

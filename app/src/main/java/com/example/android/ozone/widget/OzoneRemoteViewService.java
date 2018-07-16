@@ -10,7 +10,7 @@ import com.example.android.ozone.model.JsonData;
 
 import java.util.List;
 
-import static com.example.android.ozone.ui.view.fragment.FavouriteFragment.favData;
+import static com.example.android.ozone.ui.view.FavouriteActivity.favData;
 
 public class OzoneRemoteViewService extends RemoteViewsService {
 public static final String TEMP= "Temp ";

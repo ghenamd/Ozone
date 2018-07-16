@@ -11,6 +11,7 @@ import com.example.android.ozone.utils.notification.NotificationUtils;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 
 public class OzoneSyncTask {
 
@@ -23,7 +24,7 @@ public class OzoneSyncTask {
             JsonData data = dataList.get(i);
             String city = data.getCity();
             String state = data.getState();
-            String country = data.getState();
+            String country = data.getCountry();
             URL url = FetchData.createCityUrl(city, state, country);
             Log.d(TAG, url.toString());
             String reply = null;
@@ -33,7 +34,9 @@ public class OzoneSyncTask {
                 e.printStackTrace();
             }
             JsonData jsonData = FetchData.extractFeatureFromJson(reply);
-            database.locationDao().insertLocation(jsonData);
+            Log.d(TAG, "ozoneTask: " + Objects.requireNonNull(jsonData).getCity());
+            if (jsonData!=null){
+            database.locationDao().insertLocation(jsonData);}
         }
         NotificationUtils.showNotificationAfterUpdate(context);
     }

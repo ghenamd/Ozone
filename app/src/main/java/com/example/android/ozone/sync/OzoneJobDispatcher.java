@@ -16,7 +16,7 @@ public class OzoneJobDispatcher extends JobService {
             @Override
             protected Object doInBackground(Object[] objects) {
                 Context context= getApplicationContext();
-                OzoneSyncTask.ozoneTask(context);
+               // OzoneSyncTask.ozoneTask(context);
                 return null;
             }
 

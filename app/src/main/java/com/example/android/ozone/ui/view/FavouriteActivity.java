@@ -1,19 +1,20 @@
-package com.example.android.ozone.ui.view.fragment;
-
+package com.example.android.ozone.ui.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.ozone.R;
@@ -21,9 +22,11 @@ import com.example.android.ozone.data.AppDatabase;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.ui.view.adapter.FavouriteAdapter;
 import com.example.android.ozone.ui.view.dialog.DetailsDialog;
+import com.example.android.ozone.ui.view.settings.SettingsActivity;
 import com.example.android.ozone.utils.AppExecutors;
 import com.example.android.ozone.utils.Helper;
 import com.example.android.ozone.utils.OzoneConstants;
+import com.example.android.ozone.utils.notification.NotificationUtils;
 import com.example.android.ozone.viewModel.MainViewModel;
 import com.example.android.ozone.widget.OzoneWidgetIntentService;
 
@@ -33,11 +36,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLocationClicked{
-
+public class FavouriteActivity extends AppCompatActivity implements FavouriteAdapter.OnLocationClicked{
     @BindView(R.id.fav_frag_recycler)
     RecyclerView mRecyclerView;
     @BindView(R.id.no_fav_text)
@@ -45,25 +44,21 @@ public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLo
     private AppDatabase mDatabase;
     private FavouriteAdapter mFavouriteAdapter;
     public static List<JsonData> favData = new ArrayList<>();
-    public FavouriteFragment() {
-        // Required empty public constructor
-    }
-
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_favourite, container, false);
-        ButterKnife.bind(this, view);
-        mDatabase = AppDatabase.getInstance(getActivity());
-        final BottomNavigationView bottom_navigation = getActivity().findViewById(R.id.navigation);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_favourite);
+        ButterKnife.bind(this);
+        mDatabase = AppDatabase.getInstance(this);
+        final BottomNavigationView navigationView = findViewById(R.id.navigation);
+        navigationView.setOnNavigationItemSelectedListener(mBottomNavigationView);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0 && bottom_navigation.isShown()) {
-                    bottom_navigation.setVisibility(View.GONE);
+                if (dy > 0 && navigationView.isShown()) {
+                    navigationView.setVisibility(View.GONE);
                 } else if (dy < 0) {
-                    bottom_navigation.setVisibility(View.VISIBLE);
+                    navigationView.setVisibility(View.VISIBLE);
 
                 }
             }
@@ -76,12 +71,51 @@ public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLo
         });
         setupViewModel();
         deletePlace();
-        OzoneWidgetIntentService.startUpdateOzoneWidget(getActivity().getBaseContext());
-        return view;
+        OzoneWidgetIntentService.startUpdateOzoneWidget(this.getBaseContext());
     }
 
+    private BottomNavigationView.OnNavigationItemSelectedListener mBottomNavigationView = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.map:
+                    Intent locationIntent = new Intent(FavouriteActivity.this,MapActivity.class);
+                    startActivity(locationIntent);
+                    break;
+                case R.id.current_location:
+                    Intent favouriteIntent = new Intent(FavouriteActivity.this,LocationActivity.class);
+                    startActivity(favouriteIntent);
+                    break;
+            }
+            return false;
+        }
+    };
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_app_bar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.app_bar_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.notif:
+                NotificationUtils.showNotificationAfterUpdate(this);
+            default:
+                break;
+        }
+        return false;
+    }
     private void setupViewModel() {
-        MainViewModel viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         viewModel.getLocation().observe(this, new Observer<List<JsonData>>() {
             @Override
             public void onChanged(@Nullable List<JsonData> jsonData) {
@@ -108,13 +142,13 @@ public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLo
             public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
                 List<JsonData> jd = mFavouriteAdapter.getData();
                 JsonData jsd = jd.get(viewHolder.getAdapterPosition());
-                Helper.showToastDeleted(getActivity(),jsd.getCity());
+                Helper.showToastDeleted(getApplicationContext(),jsd.getCity());
                 AppExecutors.getInstance().diskIO().execute(new Runnable() {
                     @Override
                     public void run() {
                         int position = viewHolder.getAdapterPosition();
                         List<JsonData> jsonData = mFavouriteAdapter.getData();
-                         mDatabase.locationDao().deleteLocation(jsonData.get(position));
+                        mDatabase.locationDao().deleteLocation(jsonData.get(position));
 
                     }
                 });
@@ -124,8 +158,8 @@ public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLo
 
     //Helper method to populate the Ui
     private void populateUi(List<JsonData> data) {
-        mFavouriteAdapter = new FavouriteAdapter(new ArrayList<JsonData>(),this,getActivity());
-        LinearLayoutManager manager = new LinearLayoutManager(getActivity().getBaseContext());
+        mFavouriteAdapter = new FavouriteAdapter(new ArrayList<JsonData>(),this,this);
+        LinearLayoutManager manager = new LinearLayoutManager(this.getBaseContext());
         mFavouriteAdapter.addData(data);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setNestedScrollingEnabled(true);
@@ -135,7 +169,7 @@ public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLo
 
     @Override
     public void onItemClicked(JsonData data) {
-        Intent intent = new Intent(getActivity(), DetailsDialog.class);
+        Intent intent = new Intent(this, DetailsDialog.class);
         intent.putExtra(OzoneConstants.DETAILS, data);
         startActivity(intent);
     }

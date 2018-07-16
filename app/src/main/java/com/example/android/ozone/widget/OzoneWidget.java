@@ -8,7 +8,8 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 import com.example.android.ozone.R;
-import com.example.android.ozone.ui.view.MainActivity;
+
+import com.example.android.ozone.ui.view.LocationActivity;
 import com.example.android.ozone.utils.OzoneConstants;
 
 /**
@@ -23,7 +24,7 @@ public class OzoneWidget extends AppWidgetProvider {
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ozone_widget);
 
-        Intent click = new Intent(context, MainActivity.class);
+        Intent click = new Intent(context, LocationActivity.class);
         click.putExtra(OzoneConstants.WIDGET,1);
         PendingIntent appPendingIntent = PendingIntent.getActivity(context,0,click,PendingIntent.FLAG_UPDATE_CURRENT);
         views.setOnClickPendingIntent(R.id.widget_title,appPendingIntent);

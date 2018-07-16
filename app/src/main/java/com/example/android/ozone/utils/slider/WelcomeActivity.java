@@ -18,8 +18,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.android.ozone.ui.view.MainActivity;
 import com.example.android.ozone.R;
+import com.example.android.ozone.ui.view.LocationActivity;
 
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -121,7 +121,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private void launchHomeScreen() {
         prefManager.setFirstTimeLaunch(false);
-        startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
+        startActivity(new Intent(WelcomeActivity.this, LocationActivity.class));
         finish();
     }
 
