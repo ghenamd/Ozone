@@ -15,7 +15,7 @@ import android.support.v4.content.ContextCompat;
 import com.example.android.ozone.R;
 import com.example.android.ozone.ui.view.LocationActivity;
 
-
+//Inspired from Udacity course on Notifications
 public class NotificationUtils {
 
     private static final int OZONE_PENDING_INTENT_ID = 1234;

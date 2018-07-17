@@ -27,6 +27,12 @@
         android:id="@+id/recycler_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/snackbar_message"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_above="@+id/navigation"
+        />
     <android.support.design.widget.BottomNavigationView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

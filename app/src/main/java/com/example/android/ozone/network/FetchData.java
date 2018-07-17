@@ -4,7 +4,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.example.android.ozone.utils.OzoneConstants;
+import com.example.android.ozone.utils.constants.OzoneConstants;
 import com.example.android.ozone.model.JsonData;
 
 import org.json.JSONException;

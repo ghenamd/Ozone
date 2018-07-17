@@ -25,12 +25,12 @@ import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.ui.view.adapter.FavouriteAdapter;
 import com.example.android.ozone.ui.view.dialog.DetailsDialog;
 import com.example.android.ozone.ui.view.settings.SettingsActivity;
-import com.example.android.ozone.utils.AppExecutors;
-import com.example.android.ozone.utils.Helper;
-import com.example.android.ozone.utils.OzoneConstants;
+import com.example.android.ozone.utils.executors.AppExecutors;
+import com.example.android.ozone.utils.helper.Helper;
+import com.example.android.ozone.utils.constants.OzoneConstants;
 import com.example.android.ozone.utils.notification.NotificationUtils;
 import com.example.android.ozone.viewModel.MainViewModel;
-import com.example.android.ozone.widget.OzoneWidgetIntentService;
+import com.example.android.ozone.ui.view.widget.OzoneWidgetIntentService;
 
 import java.util.ArrayList;
 import java.util.List;

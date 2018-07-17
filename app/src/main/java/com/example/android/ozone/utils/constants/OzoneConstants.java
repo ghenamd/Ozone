@@ -1,4 +1,4 @@
-package com.example.android.ozone.utils;
+package com.example.android.ozone.utils.constants;
 
 public class OzoneConstants {
     public static final String AIR_VISUAL_API = "https://api.airvisual.com/v2/nearest_city?";

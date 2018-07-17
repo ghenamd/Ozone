@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.example.android.ozone.R;
 import com.example.android.ozone.model.JsonData;
-import com.example.android.ozone.utils.AnimatorUtil;
+import com.example.android.ozone.utils.animator.AnimatorUtil;
 
 import java.util.List;
 

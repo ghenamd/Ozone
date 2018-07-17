@@ -14,9 +14,9 @@ import com.example.android.ozone.R;
 import com.example.android.ozone.data.AppDatabase;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.network.FetchData;
-import com.example.android.ozone.utils.AppExecutors;
-import com.example.android.ozone.utils.Helper;
-import com.example.android.ozone.utils.OzoneConstants;
+import com.example.android.ozone.utils.executors.AppExecutors;
+import com.example.android.ozone.utils.helper.Helper;
+import com.example.android.ozone.utils.constants.OzoneConstants;
 import com.example.android.ozone.viewModel.QueryByNameViewModel;
 import com.example.android.ozone.viewModel.QueryByNameViewModelFactory;
 

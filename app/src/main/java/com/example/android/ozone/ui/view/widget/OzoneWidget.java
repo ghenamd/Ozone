@@ -1,4 +1,4 @@
-package com.example.android.ozone.widget;
+package com.example.android.ozone.ui.view.widget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -10,7 +10,7 @@ import android.widget.RemoteViews;
 import com.example.android.ozone.R;
 
 import com.example.android.ozone.ui.view.LocationActivity;
-import com.example.android.ozone.utils.OzoneConstants;
+import com.example.android.ozone.utils.constants.OzoneConstants;
 
 /**
  * Implementation of App Widget functionality.

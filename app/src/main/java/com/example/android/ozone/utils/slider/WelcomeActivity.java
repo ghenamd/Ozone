@@ -20,7 +20,7 @@ import android.widget.TextView;
 
 import com.example.android.ozone.R;
 import com.example.android.ozone.ui.view.LocationActivity;
-
+// Followed tutorial on https://www.androidhive.info/2016/05/android-build-intro-slider-app/
 public class WelcomeActivity extends AppCompatActivity {
 
     private ViewPager viewPager;

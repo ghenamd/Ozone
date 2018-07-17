@@ -35,15 +35,15 @@ import com.example.android.ozone.R;
 import com.example.android.ozone.data.AppDatabase;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.network.AQIntentService;
-import com.example.android.ozone.sync.OzoneFireBaseJobDispatcher;
+import com.example.android.ozone.utils.sync.OzoneFireBaseJobDispatcher;
 import com.example.android.ozone.ui.view.adapter.LocationAdapter;
 import com.example.android.ozone.ui.view.settings.SettingsActivity;
-import com.example.android.ozone.utils.AppExecutors;
-import com.example.android.ozone.utils.Helper;
-import com.example.android.ozone.utils.OzoneConstants;
+import com.example.android.ozone.utils.executors.AppExecutors;
+import com.example.android.ozone.utils.helper.Helper;
+import com.example.android.ozone.utils.constants.OzoneConstants;
 import com.example.android.ozone.utils.notification.NotificationUtils;
 import com.example.android.ozone.viewModel.MainViewModel;
-import com.example.android.ozone.widget.OzoneWidgetIntentService;
+import com.example.android.ozone.ui.view.widget.OzoneWidgetIntentService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -60,7 +60,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.example.android.ozone.utils.Helper.REQUEST_CHECK_SETTINGS;
+import static com.example.android.ozone.utils.helper.Helper.REQUEST_CHECK_SETTINGS;
 
 public class LocationActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener{
@@ -295,7 +295,7 @@ public class LocationActivity extends AppCompatActivity
     private void informUserConnectionLost() {
         noInternet.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.INVISIBLE);
-        Snackbar snackbar = Snackbar.make(LocationActivity.this.findViewById(android.R.id.content),
+        Snackbar snackbar = Snackbar.make(LocationActivity.this.findViewById(R.id.snackbar_message),
                 R.string.connection_lost, Snackbar.LENGTH_LONG);
         snackbar.show();
     }

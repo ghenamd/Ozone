@@ -8,7 +8,7 @@ import android.support.v4.app.JobIntentService;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.example.android.ozone.model.JsonData;
-import com.example.android.ozone.utils.OzoneConstants;
+import com.example.android.ozone.utils.constants.OzoneConstants;
 
 import java.io.IOException;
 import java.net.URL;

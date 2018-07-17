@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -19,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -29,16 +29,14 @@ import com.example.android.ozone.R;
 import com.example.android.ozone.model.PlaceInfo;
 import com.example.android.ozone.ui.view.dialog.MarkerDialog;
 import com.example.android.ozone.ui.view.settings.SettingsActivity;
-import com.example.android.ozone.utils.OzoneConstants;
-import com.example.android.ozone.utils.PlaceAutocompleteAdapter;
+import com.example.android.ozone.utils.constants.OzoneConstants;
+import com.example.android.ozone.ui.view.adapter.PlaceAutocompleteAdapter;
 import com.example.android.ozone.utils.notification.NotificationUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
@@ -65,6 +63,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     AutoCompleteTextView mCompleteTextView;
     @BindView(R.id.gps_icon)
     ImageView mGpsIcon;
+    @BindView(R.id.map_info)
+    ImageView mMapInfo;
     private FusedLocationProviderClient mFusedLocationClient;
     private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
     private static final String TAG = "MapActivity";
@@ -82,6 +82,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         ButterKnife.bind(this);
         initGoogleApi();
         initMap();
+        showMapInfo();
         BottomNavigationView navigationView = findViewById(R.id.navigation);
         navigationView.setOnNavigationItemSelectedListener(mBottomNavigationView);
 
@@ -200,13 +201,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Address address = addressList.get(0);
             double lat = address.getLatitude();
             double lon = address.getLongitude();
-            String place = address.getLocality();
-            moveCamera(new LatLng(lat, lon), ZOOM, place);
+
+            moveCamera(new LatLng(lat, lon), ZOOM);
         }
+    }
+    private void showMapInfo(){
+        mMapInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar snackbar = Snackbar.make(findViewById(R.id.snackbar_message), R.string.map_info_message,Snackbar.LENGTH_LONG);
+                snackbar.show();
+            }
+        });
     }
 
     //Moves Camera to the selected location
-    private void moveCamera(final LatLng latLng, float zoom, String title) {
+    private void moveCamera(final LatLng latLng, float zoom) {
         if (mMarker != null) {
             mMarker.remove();
         }
@@ -214,7 +224,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         MarkerOptions options = new MarkerOptions()
                 .position(latLng)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
-                .title(title);
+                .title("Click");
         mMarker = mMap.addMarker(options);
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -257,7 +267,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             // Logic to handle location object
                             double lat = location.getLatitude();
                             double lon = location.getLongitude();
-                            moveCamera(new LatLng(lat, lon), ZOOM, getString(R.string.my_location));
+                            moveCamera(new LatLng(lat, lon), ZOOM);
 
                         }
 
@@ -277,17 +287,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     ---------------------------- google places API autocomplete suggestion-----------
      */
 
-    private AdapterView.OnItemClickListener mItemClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            hideKeyboard();
-            final AutocompletePrediction item = mPlaceAutocompleteAdapter.getItem(i);
-            final String placeId = item.getPlaceId();
-            PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId);
-            placeResult.setResultCallback(mPlaceDetailsCallback);
 
-        }
-    };
     private ResultCallback<PlaceBuffer> mPlaceDetailsCallback = new ResultCallback<PlaceBuffer>() {
         @Override
         public void onResult(@NonNull PlaceBuffer places) {
@@ -306,7 +306,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 e.printStackTrace();
             }
             moveCamera(new LatLng(mPlace.getLat(),
-                    mPlace.getLon()), ZOOM, mPlace.getName());
+                    mPlace.getLon()), ZOOM);
             hideKeyboard();
             places.release();
         }

@@ -1,4 +1,4 @@
-package com.example.android.ozone.widget;
+package com.example.android.ozone.ui.view.widget;
 
 import android.app.IntentService;
 import android.appwidget.AppWidgetManager;

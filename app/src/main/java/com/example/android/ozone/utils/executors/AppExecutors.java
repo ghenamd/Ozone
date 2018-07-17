@@ -1,4 +1,4 @@
-package com.example.android.ozone.utils;
+package com.example.android.ozone.utils.executors;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
+//Source code Udacity Android Architecture Components course
 public class AppExecutors {
 
     private static final Object LOCK = new Object();

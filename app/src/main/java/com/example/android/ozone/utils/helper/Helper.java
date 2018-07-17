@@ -1,4 +1,4 @@
-package com.example.android.ozone.utils;
+package com.example.android.ozone.utils.helper;
 
 import android.app.Activity;
 import android.app.AlertDialog;

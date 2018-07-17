@@ -1,4 +1,4 @@
-package com.example.android.ozone.sync;
+package com.example.android.ozone.utils.sync;
 
 import android.content.Context;
 import android.os.AsyncTask;

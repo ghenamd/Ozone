@@ -1,4 +1,4 @@
-package com.example.android.ozone.utils;
+package com.example.android.ozone.utils.animator;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;

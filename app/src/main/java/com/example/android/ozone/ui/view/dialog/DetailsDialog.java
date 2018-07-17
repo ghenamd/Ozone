@@ -9,7 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import com.example.android.ozone.R;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.ui.view.adapter.DetailsDialogAdapter;
-import com.example.android.ozone.utils.OzoneConstants;
+import com.example.android.ozone.utils.constants.OzoneConstants;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
