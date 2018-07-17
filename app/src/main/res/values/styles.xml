@@ -53,5 +53,9 @@
         <item name="android:textColor">@color/gray</item>
         <item name="android:textSize">@dimen/roboto_reg_10</item>
     </style>
+  //Arrow in Settings toolbar change color to white
+    <style name="toolbar_theme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorControlNormal">@color/white</item>
+    </style>
 
 </resources>

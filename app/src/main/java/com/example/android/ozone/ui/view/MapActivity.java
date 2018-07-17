@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -77,9 +78,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activiy_maps);
+        setTitle(getString(R.string.map_activity));
         ButterKnife.bind(this);
-        initMap();
         initGoogleApi();
+        initMap();
         BottomNavigationView navigationView = findViewById(R.id.navigation);
         navigationView.setOnNavigationItemSelectedListener(mBottomNavigationView);
 
@@ -109,7 +111,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Toast.makeText(MapActivity.this,"Map is ready",Toast.LENGTH_SHORT).show();
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -162,6 +163,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 getDeviceLocation();
+                isGPSEnabled();
             }
         });
 
@@ -258,8 +260,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             moveCamera(new LatLng(lat, lon), ZOOM, getString(R.string.my_location));
 
                         }
+
                     }
                 });
+    }
+    public void isGPSEnabled(){
+        LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+        boolean enabled = service
+                .isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if (!enabled) {
+            Toast.makeText(MapActivity.this,"Please enable your Gps", Toast.LENGTH_SHORT).show();
+        }
+
     }
     /*
     ---------------------------- google places API autocomplete suggestion-----------

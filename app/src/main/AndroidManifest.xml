@@ -63,10 +63,11 @@
                 android:resource="@xml/ozone_widget_info" />
         </receiver>
 
-        <activity android:name=".ui.view.settings.SettingsActivity"/>
+        <activity android:name=".ui.view.settings.SettingsActivity" />
         <activity android:name=".ui.view.FavouriteActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ui.view.MapActivity"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 

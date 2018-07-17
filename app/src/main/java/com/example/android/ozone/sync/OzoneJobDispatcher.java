@@ -9,7 +9,7 @@ import com.firebase.jobdispatcher.JobService;
 public class OzoneJobDispatcher extends JobService {
 
     private AsyncTask mBackgroundTask;
-    //Start the job of updating dtat in the database
+    //Start the job to update the data in the database
     @Override
     public boolean onStartJob(final JobParameters job) {
         mBackgroundTask = new AsyncTask() {
@@ -30,7 +30,7 @@ public class OzoneJobDispatcher extends JobService {
         return true;
     }
 
-    //Stop job if for instance it started when user is was on WI-FI and in the middle of the job WI-FI shuts down.
+    //Stop the job if for instance its started when user is on WI-FI and in the middle of the job WI-FI shuts down.
     @Override
     public boolean onStopJob(JobParameters job) {
         if (mBackgroundTask != null){

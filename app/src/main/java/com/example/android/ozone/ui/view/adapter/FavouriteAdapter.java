@@ -89,6 +89,7 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
         }else if (aqi >200 && aqi <=300){
 
             holder.mAirStatus.setText(R.string.very_unhealthy);
+            holder.mDesc.setText(R.string.desc_unhealthy);
         }else if (aqi >300 && aqi <=500){
 
             holder.mAirStatus.setText(R.string.hazardous);

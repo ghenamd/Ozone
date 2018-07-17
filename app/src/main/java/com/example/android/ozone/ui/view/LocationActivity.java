@@ -2,6 +2,7 @@ package com.example.android.ozone.ui.view;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
@@ -59,9 +60,13 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class LocationActivity extends AppCompatActivity {
+import static com.example.android.ozone.utils.Helper.REQUEST_CHECK_SETTINGS;
+
+public class LocationActivity extends AppCompatActivity
+        implements SharedPreferences.OnSharedPreferenceChangeListener{
     private AppDatabase mDb;
     private JsonData mData;
+    private JsonData fromViewModel;
     private LocationAdapter mAdapter;
     @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
@@ -71,27 +76,21 @@ public class LocationActivity extends AppCompatActivity {
     TextView noInternet;
     @BindView(R.id.relativeLayout)
     RelativeLayout mRelativeLayout;
-    private FusedLocationProviderClient mFusedLocationClient;
     private SharedPreferences mPreferences;
-    SharedPreferences.OnSharedPreferenceChangeListener mListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals("Aqi")){
-                setupViewModel();
-            }
-        }
-    };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
+        setTitle(getString(R.string.location_activity));
         ButterKnife.bind(this);
         BottomNavigationView navigationView = findViewById(R.id.navigation);
         navigationView.setOnNavigationItemSelectedListener(mBottomNavigationView);
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mPreferences.registerOnSharedPreferenceChangeListener(mListener);
+        mPreferences.registerOnSharedPreferenceChangeListener(this);
+
         mDb = AppDatabase.getInstance(this);
-        mAdapter = new LocationAdapter(new JsonData(),this);
+        mAdapter = new LocationAdapter(new JsonData(), this);
         if (Helper.isConnected(this)) {
             mProgressBar.setVisibility(View.VISIBLE);
             initPermissions();
@@ -129,11 +128,11 @@ public class LocationActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.map:
-                    Intent locationIntent = new Intent(LocationActivity.this,MapActivity.class);
+                    Intent locationIntent = new Intent(LocationActivity.this, MapActivity.class);
                     startActivity(locationIntent);
                     break;
                 case R.id.favourite:
-                    Intent favouriteIntent = new Intent(LocationActivity.this,FavouriteActivity.class);
+                    Intent favouriteIntent = new Intent(LocationActivity.this, FavouriteActivity.class);
                     startActivity(favouriteIntent);
                     break;
             }
@@ -163,6 +162,39 @@ public class LocationActivity extends AppCompatActivity {
         }
         return false;
     }
+
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        if (fromViewModel==null){
+//            Helper.settingsRequest(this);
+//        }
+//
+//    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPreferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(AQIntentService.ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+        mPreferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+
     //Request user permission to get the last location
     private void initPermissions() {
         Dexter.withActivity(this)
@@ -192,30 +224,11 @@ public class LocationActivity extends AppCompatActivity {
                 }).check();
     }
 
-    //A BroadcastReceiver is used to get the JsonData object from the AQIntentService
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int resultCode = intent.getIntExtra("resultCode", RESULT_CANCELED);
-            if (resultCode == RESULT_OK) {
-                synchronized (this) {
-                    mData = intent.getParcelableExtra("data");
-                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            mDb.locationDao().insertLocation(mData);
-                        }
-                    });
-                }
-            }
-        }
-    };
-
     @SuppressLint("MissingPermission")
     private void getLastLocation() {
-        mFusedLocationClient = LocationServices.
+        FusedLocationProviderClient fusedLocationClient = LocationServices.
                 getFusedLocationProviderClient(this.getApplicationContext());
-        mFusedLocationClient.getLastLocation()
+        fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
@@ -234,6 +247,25 @@ public class LocationActivity extends AppCompatActivity {
                     }
                 });
     }
+    //A BroadcastReceiver is used to get the JsonData object from the AQIntentService
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int resultCode = intent.getIntExtra("resultCode", RESULT_CANCELED);
+            if (resultCode == RESULT_OK) {
+                synchronized (this) {
+                    mData = intent.getParcelableExtra("data");
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mData!=null){
+                                mDb.locationDao().insertLocation(mData);}
+                        }
+                    });
+                }
+            }
+        }
+    };
 
     /**
      * If there is no internet connection we can use a ViewModel to retrieve
@@ -247,13 +279,11 @@ public class LocationActivity extends AppCompatActivity {
             public void onChanged(@Nullable List<JsonData> jsonData) {
                 if ((jsonData != null && jsonData.size() > 0)) {
 
-                    JsonData jd = Helper.getLastListItem(jsonData);
-                    if (jd != null) {
-                        Helper.populateUi(jd,LocationActivity.this,
-                                mAdapter,mRecyclerView,mProgressBar);
+                    fromViewModel = Helper.getLastListItem(jsonData);
+                    if (fromViewModel != null) {
+                        Helper.populateUi(fromViewModel, LocationActivity.this,
+                                mAdapter, mRecyclerView, mProgressBar);
                     }
-                } else if(Helper.isConnected(LocationActivity.this)){
-                    getLastLocation();
                 }
             }
         });
@@ -261,7 +291,7 @@ public class LocationActivity extends AppCompatActivity {
     }
 
 
-    // method to inform user about lost internet connection
+    // Inform user about lost internet connection
     private void informUserConnectionLost() {
         noInternet.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.INVISIBLE);
@@ -270,22 +300,27 @@ public class LocationActivity extends AppCompatActivity {
         snackbar.show();
     }
 
-    /*
-    -------------------------------Helper Methods --------------------------------------------------
-     */
-
     @Override
-    public void onResume() {
-        super.onResume();
-        IntentFilter filter = new IntentFilter(AQIntentService.ACTION);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            // Check for the integer request code originally supplied to startResolutionForResult().
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        getLastLocation();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        Helper.settingsRequest(LocationActivity.this);//keep asking
+                        break;
+                }
+                break;
+        }
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-        mPreferences.unregisterOnSharedPreferenceChangeListener(mListener);
-
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("Aqi")) {
+           setupViewModel();
+        }
     }
 }
