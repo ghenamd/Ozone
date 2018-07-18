@@ -131,6 +131,7 @@
 
                 <TextView
                     android:id="@+id/wind_speed"
+                    android:paddingEnd="2dp"
                     style="@style/text_icon" />
 
             </LinearLayout>
