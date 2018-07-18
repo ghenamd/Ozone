@@ -61,23 +61,23 @@ public class FavouriteActivity extends AppCompatActivity implements FavouriteAda
         //Code picked from stackoverflow and adjusted for this app
         final BottomNavigationView navigationView = findViewById(R.id.navigation);
         navigationView.setOnNavigationItemSelectedListener(mBottomNavigationView);
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0 && navigationView.isShown()) {
-                    navigationView.setVisibility(View.GONE);
-                } else if (dy < 0) {
-                    navigationView.setVisibility(View.VISIBLE);
-
-                }
-            }
-
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-        });
+//        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//                if (dy > 0 && navigationView.isShown()) {
+//                    navigationView.setVisibility(View.GONE);
+//                } else if (dy < 0) {
+//                    navigationView.setVisibility(View.VISIBLE);
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+//
+//                super.onScrollStateChanged(recyclerView, newState);
+//            }
+//        });
         setupViewModel();
         deletePlace();
         OzoneWidgetIntentService.startUpdateOzoneWidget(this.getBaseContext());
