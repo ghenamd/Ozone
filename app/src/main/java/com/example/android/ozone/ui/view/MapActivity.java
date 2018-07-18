@@ -26,25 +26,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.ozone.R;
-import com.example.android.ozone.model.PlaceInfo;
+import com.example.android.ozone.ui.view.adapter.PlaceAutocompleteAdapter;
 import com.example.android.ozone.ui.view.dialog.MarkerDialog;
 import com.example.android.ozone.ui.view.settings.SettingsActivity;
 import com.example.android.ozone.utils.constants.OzoneConstants;
-import com.example.android.ozone.ui.view.adapter.PlaceAutocompleteAdapter;
 import com.example.android.ozone.utils.notification.NotificationUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -65,7 +62,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     ImageView mGpsIcon;
     @BindView(R.id.map_info)
     ImageView mMapInfo;
-    private FusedLocationProviderClient mFusedLocationClient;
+    public static final String LAST_LOCATION_KEY = "last_location_key";
+    public static final String CAMERA_POSITION_KEY = "camera_position_key";
     private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
     private static final String TAG = "MapActivity";
     private GoogleMap mMap;
@@ -73,10 +71,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(49.38, -17.39), new LatLng(59.53, 8.96));
     private GoogleApiClient mGoogleApiClient;
     private Marker mMarker;
-    private PlaceInfo mPlace;
+    private Location mLastLocation;
+    private CameraPosition mCameraPosition;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState!=null){
+            mLastLocation = savedInstanceState.getParcelable(LAST_LOCATION_KEY);
+            mCameraPosition = savedInstanceState.getParcelable(CAMERA_POSITION_KEY);
+
+        }
         setContentView(R.layout.activiy_maps);
         setTitle(getString(R.string.map_activity));
         ButterKnife.bind(this);
@@ -115,7 +119,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
-        init();
+        getDeviceLocation();
+        initPlaceAutoComplete();
 
     }
     @Override
@@ -146,7 +151,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Toast.makeText(MapActivity.this,R.string.please_check_your_intenet_connection,Toast.LENGTH_SHORT).show();
     }
 
-    private void init() {
+    private void initPlaceAutoComplete() {
         mCompleteTextView.setAdapter(mPlaceAutocompleteAdapter);
         mCompleteTextView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -159,7 +164,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 return false;
             }
         });
-        //When the gps icon is clicked it returns the map to the devices current location
+        //When the gps icon is clicked it moves camera to the devices current location
         mGpsIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -202,7 +207,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             double lat = address.getLatitude();
             double lon = address.getLongitude();
 
-            moveCamera(new LatLng(lat, lon), ZOOM);
+            moveCameraTo(new LatLng(lat, lon), ZOOM);
         }
     }
     private void showMapInfo(){
@@ -216,15 +221,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     //Moves Camera to the selected location
-    private void moveCamera(final LatLng latLng, float zoom) {
+    private void moveCameraTo(final LatLng latLng, float zoom) {
         if (mMarker != null) {
             mMarker.remove();
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
         MarkerOptions options = new MarkerOptions()
                 .position(latLng)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
-                .title("Click");
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
         mMarker = mMap.addMarker(options);
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -256,18 +260,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
      */
     @SuppressLint("MissingPermission")
     private void getDeviceLocation() {
-        mFusedLocationClient = LocationServices.
+        FusedLocationProviderClient fusedLocationClient = LocationServices.
                 getFusedLocationProviderClient(this.getApplicationContext());
-        mFusedLocationClient.getLastLocation()
+        fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
+                        mLastLocation = location;
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             // Logic to handle location object
                             double lat = location.getLatitude();
                             double lon = location.getLongitude();
-                            moveCamera(new LatLng(lat, lon), ZOOM);
+                            moveCameraTo(new LatLng(lat, lon), ZOOM);
 
                         }
 
@@ -283,33 +288,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
     }
-    /*
-    ---------------------------- google places API autocomplete suggestion-----------
-     */
-
-
-    private ResultCallback<PlaceBuffer> mPlaceDetailsCallback = new ResultCallback<PlaceBuffer>() {
-        @Override
-        public void onResult(@NonNull PlaceBuffer places) {
-            if (!places.getStatus().isSuccess()) {
-                places.release();
-                return;
-            }
-            final Place place = places.get(0);
-
-            try {
-                mPlace = new PlaceInfo();
-                mPlace.setName(place.getName().toString());
-                mPlace.setLat(place.getViewport().getCenter().latitude);
-                mPlace.setLon(place.getViewport().getCenter().longitude);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            moveCamera(new LatLng(mPlace.getLat(),
-                    mPlace.getLon()), ZOOM);
-            hideKeyboard();
-            places.release();
+    //Save marker position
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (mMap !=null){
+         outState.putParcelable(LAST_LOCATION_KEY, mLastLocation);
+         outState.putParcelable(CAMERA_POSITION_KEY,mMap.getCameraPosition());
         }
-
-    };
+        super.onSaveInstanceState(outState);
+    }
 }
