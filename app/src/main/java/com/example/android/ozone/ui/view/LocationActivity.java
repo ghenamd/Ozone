@@ -35,15 +35,14 @@ import com.example.android.ozone.R;
 import com.example.android.ozone.data.AppDatabase;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.network.AQIntentService;
-import com.example.android.ozone.utils.sync.OzoneFireBaseJobDispatcher;
 import com.example.android.ozone.ui.view.adapter.LocationAdapter;
 import com.example.android.ozone.ui.view.settings.SettingsActivity;
+import com.example.android.ozone.ui.view.widget.OzoneWidgetIntentService;
+import com.example.android.ozone.utils.constants.OzoneConstants;
 import com.example.android.ozone.utils.executors.AppExecutors;
 import com.example.android.ozone.utils.helper.Helper;
-import com.example.android.ozone.utils.constants.OzoneConstants;
-import com.example.android.ozone.utils.notification.NotificationUtils;
+import com.example.android.ozone.utils.sync.OzoneFireBaseJobDispatcher;
 import com.example.android.ozone.viewModel.MainViewModel;
-import com.example.android.ozone.ui.view.widget.OzoneWidgetIntentService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -155,8 +154,6 @@ public class LocationActivity extends AppCompatActivity
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.notif:
-                NotificationUtils.showNotificationAfterUpdate(this);
             default:
                 break;
         }
@@ -254,7 +251,7 @@ public class LocationActivity extends AppCompatActivity
             int resultCode = intent.getIntExtra("resultCode", RESULT_CANCELED);
             if (resultCode == RESULT_OK) {
                 synchronized (this) {
-                    mData = intent.getParcelableExtra("data");
+                    mData = intent.getParcelableExtra(getString(R.string.data));
                     AppExecutors.getInstance().diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -319,7 +316,7 @@ public class LocationActivity extends AppCompatActivity
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("Aqi")) {
+        if (key.equals(getString(R.string.pref_aqi_key))) {
            setupViewModel();
         }
     }

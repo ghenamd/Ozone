@@ -22,10 +22,10 @@ public class OzoneSyncTask {
         List<JsonData> dataList = database.locationDao().getAllPlaces();
         for (int i = 0; i <dataList.size() ; i++) {
             JsonData data = dataList.get(i);
-            String city = data.getCity();
-            String state = data.getState();
-            String country = data.getCountry();
-            URL url = FetchData.createCityUrl(city, state, country);
+            double lat = data.getLat();
+            double lon = data.getLon();
+
+            URL url = FetchData.createUrl(String.valueOf(lat),String.valueOf(lon));
             Log.d(TAG, url.toString());
             String reply = null;
             try {
@@ -38,6 +38,8 @@ public class OzoneSyncTask {
             if (jsonData!=null){
             database.locationDao().insertLocation(jsonData);}
         }
+        //After data has been updated show user a notification
+        //This has been implemented only for practicing purpose
         NotificationUtils.showNotificationAfterUpdate(context);
     }
 

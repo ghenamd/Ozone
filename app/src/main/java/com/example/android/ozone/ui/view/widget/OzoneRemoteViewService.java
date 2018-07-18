@@ -22,7 +22,6 @@ public static final String CELSIUS= "C";
         return new OzoneRemoteViewsFactory(this.getApplicationContext());
     }
 
-
     //Inner class remoteViewsFactory
     public class OzoneRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
@@ -90,6 +89,5 @@ public static final String CELSIUS= "C";
         }
 
     }
-
 
 }

@@ -63,13 +63,20 @@ public class JsonData implements Parcelable {
     @Expose
     private int aqicn;
 
+    @SerializedName("lat")
+    @Expose
+    private double lat;
+
+    @SerializedName("lon")
+    @Expose
+    private double lon;
     @Ignore
     public JsonData() {
     }
 
-
-    public JsonData(String city, String state, String country, String ts, int hu,
-                    String ic, int pr, int tp, int wd, double ws, int aqius, int aqicn) {
+    public JsonData(@NonNull String city, String state, String country, String ts, int hu,
+                    String ic, int pr, int tp, int wd, double ws,
+                    int aqius, int aqicn, double lat, double lon) {
         this.city = city;
         this.state = state;
         this.country = country;
@@ -82,8 +89,9 @@ public class JsonData implements Parcelable {
         this.ws = ws;
         this.aqius = aqius;
         this.aqicn = aqicn;
+        this.lat = lat;
+        this.lon = lon;
     }
-
 
     protected JsonData(Parcel in) {
         city = in.readString();
@@ -98,6 +106,8 @@ public class JsonData implements Parcelable {
         ws = in.readDouble();
         aqius = in.readInt();
         aqicn = in.readInt();
+        lat = in.readDouble();
+        lon = in.readDouble();
     }
 
     public static final Creator<JsonData> CREATOR = new Creator<JsonData>() {
@@ -112,11 +122,12 @@ public class JsonData implements Parcelable {
         }
     };
 
+    @NonNull
     public String getCity() {
         return city;
     }
 
-    public void setCity(String city) {
+    public void setCity(@NonNull String city) {
         this.city = city;
     }
 
@@ -208,6 +219,22 @@ public class JsonData implements Parcelable {
         this.aqicn = aqicn;
     }
 
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLon() {
+        return lon;
+    }
+
+    public void setLon(double lon) {
+        this.lon = lon;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -227,5 +254,7 @@ public class JsonData implements Parcelable {
         parcel.writeDouble(ws);
         parcel.writeInt(aqius);
         parcel.writeInt(aqicn);
+        parcel.writeDouble(lat);
+        parcel.writeDouble(lon);
     }
 }

@@ -4,9 +4,10 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.example.android.ozone.utils.constants.OzoneConstants;
 import com.example.android.ozone.model.JsonData;
+import com.example.android.ozone.utils.constants.OzoneConstants;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -100,10 +101,14 @@ public class FetchData {
             JSONObject pollutionObject = currentObject.getJSONObject("pollution");
             int aqius = pollutionObject.getInt("aqius");
             int aqicn = pollutionObject.getInt("aqicn");
-            jsonData = new JsonData(city,state,country,ts,hu,ic,pr,tp,wd,ws,aqius,aqicn);
+            JSONObject currentLocation = responseObject.getJSONObject("location");
+            JSONArray coordinates = currentLocation.getJSONArray("coordinates");
+            double lon = coordinates.getDouble(0);
+            double lat = coordinates.getDouble(1);
+            jsonData = new JsonData(city,state,country,ts,hu,ic,pr,tp,wd,ws,aqius,aqicn,lat,lon);
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(TAG, "Problem parsing the book JSON results", e);
+            Log.e(TAG, "Problem parsing the location JSON results", e);
         }
         return jsonData;
     }

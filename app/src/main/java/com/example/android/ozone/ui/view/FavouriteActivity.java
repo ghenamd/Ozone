@@ -185,7 +185,7 @@ public class FavouriteActivity extends AppCompatActivity implements FavouriteAda
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("Aqi")){
+        if (key.equals(getString(R.string.pref_aqi_key))){
             populateUi(favData);
         }
     }

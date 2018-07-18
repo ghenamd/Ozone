@@ -23,7 +23,7 @@ public class OzoneFireBaseJobDispatcher {
     private static boolean sInitialized;
     private static final String OZONE_SYNC_TAG = "ozone_sync_tag";
 
-    //
+    //Schedule the JobService OzoneJobDispatcher
     static void scheduleFirebaseJobDispatcherSync(@NonNull final Context context) {
 
         Driver driver = new GooglePlayDriver(context);
@@ -35,7 +35,8 @@ public class OzoneFireBaseJobDispatcher {
                 .setConstraints(Constraint.ON_ANY_NETWORK)
                 .setLifetime(Lifetime.FOREVER)
                 .setRecurring(true)
-                .setTrigger(Trigger.executionWindow(60, 90))
+                .setTrigger(Trigger.executionWindow(SYNC_INTERVAL_SECONDS,
+                        SYNC_INTERVAL_SECONDS + SYNC_FLEXTIME_SECONDS))
                 .setReplaceCurrent(true)
                 .build();
 

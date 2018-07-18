@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -45,6 +46,7 @@ public class MarkerDialog extends AppCompatActivity {
     private static final String TAG = "MarkerDialog";
     public JsonData mData = new JsonData();
     private String loc=null;
+    public static final String STATION = " Station";
 
 
     @Override
@@ -68,6 +70,7 @@ public class MarkerDialog extends AppCompatActivity {
         protected JsonData doInBackground(Void... voids) {
             URL url = FetchData.createUrl(String.valueOf(lat),
                     String.valueOf(lon));
+            Log.d(TAG, "doInBackground: " + url.toString());
             String reply = null;
             try {
                 reply = FetchData.getResponseFromHttpUrl(url);
@@ -81,7 +84,7 @@ public class MarkerDialog extends AppCompatActivity {
         protected void onPostExecute(JsonData data) {
             if (data != null) {
                 mData = data;
-                mLocation.setText(data.getCity());
+                mLocation.setText(data.getCity() + STATION);
                 isFavourite(data.getCity());
                 mDialogAqi.setText(getString(R.string.aqi) + data.getAqius());
                 mButton.setVisibility(View.VISIBLE);
@@ -100,6 +103,7 @@ public class MarkerDialog extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (isFavourite(mData.getCity())) {
+                    Log.d(TAG, "MarkerDialog " + mData.getCity() + mData.getState()+ mData.getCountry());
                     mButton.setImageResource(R.drawable.ic_star_white);
                     deleteFavorite(mData);
                     Helper.showToastDeleted(getBaseContext(),mData.getCity());

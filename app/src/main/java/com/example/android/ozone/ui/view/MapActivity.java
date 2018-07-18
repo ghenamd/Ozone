@@ -30,7 +30,6 @@ import com.example.android.ozone.ui.view.adapter.PlaceAutocompleteAdapter;
 import com.example.android.ozone.ui.view.dialog.MarkerDialog;
 import com.example.android.ozone.ui.view.settings.SettingsActivity;
 import com.example.android.ozone.utils.constants.OzoneConstants;
-import com.example.android.ozone.utils.notification.NotificationUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -134,8 +133,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.notif:
-                NotificationUtils.showNotificationAfterUpdate(this);
             default:
                 break;
         }
@@ -287,7 +284,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onSaveInstanceState(Bundle outState) {
         if (mMap !=null){
          outState.putParcelable(ADDRESS_KEY, mAddress);
-
         }
         super.onSaveInstanceState(outState);
     }
