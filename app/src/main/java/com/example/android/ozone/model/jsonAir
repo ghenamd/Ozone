@@ -92,11 +92,3 @@
     }
   }
 }
-
-if (savedInstanceState!=null){
-mLastLocation = savedInstanceState.getParcelable(LAST_LOCATION_KEY);
-mCameraPosition = savedInstanceState.getParcelable(CAMERA_POSITION_KEY);
-
-}
-public static final String LAST_LOCATION_KEY = "last_location_key";
-public static final String CAMERA_POSITION_KEY = "camera_position_key";

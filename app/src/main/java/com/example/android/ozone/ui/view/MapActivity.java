@@ -41,7 +41,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -62,8 +61,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     ImageView mGpsIcon;
     @BindView(R.id.map_info)
     ImageView mMapInfo;
-    public static final String LAST_LOCATION_KEY = "last_location_key";
-    public static final String CAMERA_POSITION_KEY = "camera_position_key";
+    public static final String ADDRESS_KEY = "addresskey";
     private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
     private static final String TAG = "MapActivity";
     private GoogleMap mMap;
@@ -71,14 +69,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(49.38, -17.39), new LatLng(59.53, 8.96));
     private GoogleApiClient mGoogleApiClient;
     private Marker mMarker;
-    private Location mLastLocation;
-    private CameraPosition mCameraPosition;
+    private Address mAddress;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState!=null){
-            mLastLocation = savedInstanceState.getParcelable(LAST_LOCATION_KEY);
-            mCameraPosition = savedInstanceState.getParcelable(CAMERA_POSITION_KEY);
+            mAddress = savedInstanceState.getParcelable(ADDRESS_KEY);
 
         }
         setContentView(R.layout.activiy_maps);
@@ -119,7 +115,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
-        getDeviceLocation();
+        locatePlace();
         initPlaceAutoComplete();
 
     }
@@ -203,10 +199,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             Log.d(TAG, "locatePlace: " + e.getMessage());
         }
         if (addressList.size() > 0) {
-            Address address = addressList.get(0);
-            double lat = address.getLatitude();
-            double lon = address.getLongitude();
-
+            mAddress = addressList.get(0);
+            double lat = mAddress.getLatitude();
+            double lon = mAddress.getLongitude();
             moveCameraTo(new LatLng(lat, lon), ZOOM);
         }
     }
@@ -266,7 +261,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
-                        mLastLocation = location;
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             // Logic to handle location object
@@ -284,7 +278,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         boolean enabled = service
                 .isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (!enabled) {
-            Toast.makeText(MapActivity.this,"Please enable your Gps", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MapActivity.this, R.string.please_enable_gps, Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -292,8 +286,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (mMap !=null){
-         outState.putParcelable(LAST_LOCATION_KEY, mLastLocation);
-         outState.putParcelable(CAMERA_POSITION_KEY,mMap.getCameraPosition());
+         outState.putParcelable(ADDRESS_KEY, mAddress);
+
         }
         super.onSaveInstanceState(outState);
     }

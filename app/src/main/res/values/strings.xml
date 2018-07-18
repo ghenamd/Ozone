@@ -63,6 +63,7 @@
     <string name="map_info">Map info</string>
     <string name="move_marker_to_your_location">Move marker to your location</string>
     <string name="map_info_message">Click on marker add Location to Favourites</string>
+    <string name="please_enable_gps">Please enable your Gps</string>
 
 
 </resources>
