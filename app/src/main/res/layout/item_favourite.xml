@@ -24,6 +24,16 @@
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
                 android:textColor="@android:color/white"
                 tools:text="London" />
+            <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/share"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_share"
+                android:background="@color/dot_dark_screen1"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"/>
 
             <LinearLayout
                 android:id="@+id/linear_container1"

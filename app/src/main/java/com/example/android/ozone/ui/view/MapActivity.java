@@ -74,7 +74,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         if (savedInstanceState!=null){
             mAddress = savedInstanceState.getParcelable(ADDRESS_KEY);
-
         }
         setContentView(R.layout.activiy_maps);
         setTitle(getString(R.string.map_activity));

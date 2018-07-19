@@ -16,7 +16,6 @@
     <string name="map">Map</string>
     <string name="favourite">Favourite</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="air_quality_index_color">Air quality index color</string>
     <string name="textview">TextView</string>
@@ -28,7 +27,7 @@
     <string name="unhealthy">Unhealthy</string>
     <string name="very_unhealthy">Very Unhealthy</string>
     <string name="hazardous">Hazardous</string>
-    <string name="please_check_your_intenet_connection">Please check internet connection</string>
+    <string name="please_check_your_intenet_connection">No internet connection</string>
     <string name="enter_a_place_name_or_address">Enter a place name or address</string>
     <string name="source_www_airvisual_com">Source: www.airvisual.com</string>
     <string name="desc_good">Air quality is considered satisfactory, and air pollution poses little or no risk.</string>
@@ -65,6 +64,5 @@
     <string name="map_info_message">Click on marker add Location to Favourites</string>
     <string name="please_enable_gps">Please enable your Gps</string>
     <string name="data">data</string>
-
 
 </resources>

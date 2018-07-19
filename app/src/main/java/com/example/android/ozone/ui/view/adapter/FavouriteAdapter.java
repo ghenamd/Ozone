@@ -1,6 +1,7 @@
 package com.example.android.ozone.ui.view.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -8,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.android.ozone.R;
@@ -20,11 +22,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.ViewHolder> {
+
     private List<JsonData> mData;
     private OnLocationClicked mLocationClicked;
-    int prevPosition = 0;
+    private int prevPosition = 0;
     private Context mContext;
-    public static final String AQI = "Aqi-";
+    private static final String AQI = "Aqi-";
 
     public FavouriteAdapter(List<JsonData> dataList, OnLocationClicked clicked, Context context) {
         mData = dataList;
@@ -40,11 +43,11 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
         String aqiValue = pref.getString("Aqi","Us");
         JsonData jsonData = mData.get(position);
-        String city = jsonData.getCity();
+        final String city = jsonData.getCity();
 
         int temp = jsonData.getTp();
         holder.mCity.setText(city);
@@ -66,11 +69,24 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
             AnimatorUtil.animate(holder,false);
         }
         prevPosition = position;
+        holder.mShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_TEXT,"In " +
+                        holder.mCity.getText() + " "+
+                        holder.mDesc.getText());
+                shareIntent.setType("text/plain");
+                mContext.startActivity(Intent.createChooser(shareIntent, "Send To"));
+            }
+        });
 
     }
+
     public interface OnLocationClicked{
         void onItemClicked(JsonData data);
     }
+
     private void setViewHolder(int aqi,ViewHolder holder){
         if (aqi <= 50){
             holder.mAirStatus.setText(R.string.good);
@@ -95,7 +111,6 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
             holder.mAirStatus.setText(R.string.hazardous);
             holder.mDesc.setText(R.string.desc_hazardous);
         }
-
     }
 
     @Override
@@ -120,6 +135,9 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
         TextView mDesc;
         @BindView(R.id.favourite_aqi)
         TextView mAqi;
+        @BindView(R.id.share)
+        ImageButton mShare;
+
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
