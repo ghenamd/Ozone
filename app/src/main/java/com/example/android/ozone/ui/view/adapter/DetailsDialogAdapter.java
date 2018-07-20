@@ -38,7 +38,6 @@ public class DetailsDialogAdapter extends RecyclerView.Adapter<DetailsDialogAdap
     @Override
     public void onBindViewHolder(@NonNull DetailsDialogAdapter.ViewHolder hold, int position) {
         holder = hold;
-        hold.aqiNumber.setText(String.valueOf(mData.getAqius()));
         hold.city.setText(mData.getCity());
         hold.country.setText(mData.getState() +", " +mData.getCountry());
         hold.humidityPercentage.setText(String.valueOf(mData.getHu()+ "%"));
@@ -50,11 +49,13 @@ public class DetailsDialogAdapter extends RecyclerView.Adapter<DetailsDialogAdap
         String aqiValue = sharedPreferences.getString("Aqi","Us");
         if (aqiValue.equals("Us")){
             aqi = mData.getAqius();
+            hold.aqiNumber.setText(String.valueOf(mData.getAqius()));
             holder.dialogUsCn.setText(R.string.us_lable_aqi);
             setViewHolder(aqi);
 
         }else if(aqiValue.equals("Cn")){
             aqi = mData.getAqicn();
+            hold.aqiNumber.setText(String.valueOf(mData.getAqicn()));
             holder.dialogUsCn.setText(R.string.cn_lable_aqi);
             setViewHolder(aqi);
         }

@@ -17,6 +17,7 @@ import butterknife.ButterKnife;
 public class DetailsDialog extends AppCompatActivity {
     @BindView(R.id.recycler_details_dialog)
     RecyclerView mRecyclerView;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,7 +27,8 @@ public class DetailsDialog extends AppCompatActivity {
         LinearLayoutManager manager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(manager);
         mRecyclerView.setHasFixedSize(true);
-        DetailsDialogAdapter adapter = new DetailsDialogAdapter(dt,this);
+        DetailsDialogAdapter adapter = new DetailsDialogAdapter(dt, this);
         mRecyclerView.setAdapter(adapter);
     }
+
 }

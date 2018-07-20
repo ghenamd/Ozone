@@ -45,7 +45,6 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull LocationAdapter.ViewHolder hold, int position) {
         holder = hold;
-        holder.aqiNumber.setText(String.valueOf(mData.getAqius()));
         holder.city.setText(mData.getCity());
         holder.country.setText(mData.getState() + ", " + mData.getCountry());
         holder.humidityPercentage.setText(String.valueOf(mData.getHu() + "%"));
@@ -63,6 +62,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
         String aqiValue = sharedPreferences.getString("Aqi", "Us");
         if (aqiValue.equals("Us")) {
             holder.mAqiUsCn.setText(R.string.us_lable_aqi);
+            holder.aqiNumber.setText(String.valueOf(mData.getAqius()));
             if (jsonData.getAqius() <= 50) {
                 holder.circleView.setImageResource(R.drawable.green_circle);
                 holder.airCondition.setText(R.string.good);
@@ -89,6 +89,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
             }
         } else if (aqiValue.equals("Cn")) {
             holder.mAqiUsCn.setText(R.string.cn_lable_aqi);
+            holder.aqiNumber.setText(String.valueOf(mData.getAqicn()));
             if (jsonData.getAqicn() <= 50) {
                 holder.circleView.setImageResource(R.drawable.green_circle);
                 holder.airCondition.setText(R.string.good);
