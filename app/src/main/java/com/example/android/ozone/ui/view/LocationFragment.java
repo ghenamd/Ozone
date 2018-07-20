@@ -119,7 +119,6 @@ public class LocationFragment extends Fragment
         //Initialize FirebaseJobDispatcherSync
         OzoneFireBaseJobDispatcher.initialize(getActivity());
         OzoneWidgetIntentService.startUpdateOzoneWidget(getActivity());
-
         return view;
     }
 
@@ -150,9 +149,7 @@ public class LocationFragment extends Fragment
         super.onResume();
         IntentFilter filter = new IntentFilter(AQIntentService.ACTION);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
-        mPreferences.registerOnSharedPreferenceChangeListener(this);
     }
-
 
     //Request user permission to get the last location
     private void initPermissions() {
@@ -276,7 +273,6 @@ public class LocationFragment extends Fragment
                 break;
         }
     }
-
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {

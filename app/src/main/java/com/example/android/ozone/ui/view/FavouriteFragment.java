@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -54,26 +53,6 @@ public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLo
         mPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mPreferences.registerOnSharedPreferenceChangeListener(this);
         mDatabase = AppDatabase.getInstance(getActivity());
-        //Hide bottomNavigationView
-        final BottomNavigationView bottom_navigation = getActivity().findViewById(R.id.navigation);
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0 && bottom_navigation.isShown()) {
-                    bottom_navigation.setVisibility(View.GONE);
-                } else if (dy < 0) {
-                    bottom_navigation.setVisibility(View.VISIBLE);
-
-                }
-            }
-
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-        });
-
         setupViewModel();
         deletePlace();
         OzoneWidgetIntentService.startUpdateOzoneWidget(getActivity());
@@ -143,7 +122,7 @@ public class FavouriteFragment extends Fragment implements FavouriteAdapter.OnLo
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.pref_aqi_key))){
-            populateUi(favData);
+            setupViewModel();
         }
     }
 
