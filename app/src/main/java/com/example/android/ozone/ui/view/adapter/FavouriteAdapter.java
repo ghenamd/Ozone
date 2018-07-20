@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -90,25 +91,31 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
     private void setViewHolder(int aqi,ViewHolder holder){
         if (aqi <= 50){
             holder.mAirStatus.setText(R.string.good);
+            holder.mAirStatus.setTextColor(ContextCompat.getColor(mContext,R.color.green));
             holder.mDesc.setText(R.string.desc_good);
         }else if (aqi > 50 && aqi <=100){
             holder.mAirStatus.setText(R.string.moderate);
+            holder.mAirStatus.setTextColor(ContextCompat.getColor(mContext,R.color.yellow));
             holder.mDesc.setText(R.string.desc_moderate);
         }else if (aqi>100 && aqi<=150){
 
             holder.mAirStatus.setText(R.string.unhealthy);
+            holder.mAirStatus.setTextColor(ContextCompat.getColor(mContext,R.color.orange));
             holder.mDesc.setText(R.string.desc_unhealthy);
         }else if (aqi>150 && aqi <=200){
 
             holder.mAirStatus.setText(R.string.unhealthy);
+            holder.mAirStatus.setTextColor(ContextCompat.getColor(mContext,R.color.red));
             holder.mDesc.setText(R.string.desc_unhealthy);
         }else if (aqi >200 && aqi <=300){
 
             holder.mAirStatus.setText(R.string.very_unhealthy);
+            holder.mAirStatus.setTextColor(ContextCompat.getColor(mContext,R.color.purple));
             holder.mDesc.setText(R.string.desc_unhealthy);
         }else if (aqi >300 && aqi <=500){
 
             holder.mAirStatus.setText(R.string.hazardous);
+            holder.mAirStatus.setTextColor(ContextCompat.getColor(mContext,R.color.maroon));
             holder.mDesc.setText(R.string.desc_hazardous);
         }
     }

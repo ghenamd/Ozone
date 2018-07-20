@@ -3,8 +3,5 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/app_bar_settings"
         android:title="@string/settings"/>
-    <item android:id="@+id/notif"
-        android:title="Notification"/>
-
 
 </menu>

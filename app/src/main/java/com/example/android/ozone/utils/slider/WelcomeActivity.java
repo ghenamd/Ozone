@@ -19,7 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.android.ozone.R;
-import com.example.android.ozone.ui.view.LocationActivity;
+import com.example.android.ozone.ui.view.MainActivity;
+
 // Followed tutorial on https://www.androidhive.info/2016/05/android-build-intro-slider-app/
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -121,7 +122,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private void launchHomeScreen() {
         prefManager.setFirstTimeLaunch(false);
-        startActivity(new Intent(WelcomeActivity.this, LocationActivity.class));
+        startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
         finish();
     }
 

@@ -57,5 +57,9 @@
     <style name="toolbar_theme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="colorControlNormal">@color/white</item>
     </style>
+    //Dialog activity style no title bar
+    <style name="DialogStyle" parent="Theme.AppCompat.Light.Dialog">
+        <item name="windowNoTitle">true</item>
+    </style>
 
 </resources>

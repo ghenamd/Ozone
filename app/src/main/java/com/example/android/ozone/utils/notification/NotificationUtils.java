@@ -13,7 +13,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
 import com.example.android.ozone.R;
-import com.example.android.ozone.ui.view.LocationActivity;
+import com.example.android.ozone.ui.view.LocationFragment;
 
 //Inspired from Udacity course on Notifications
 public class NotificationUtils {
@@ -50,7 +50,7 @@ public class NotificationUtils {
     }
 
     private static PendingIntent contentIntent(Context context) {
-        Intent intent = new Intent(context, LocationActivity.class);
+        Intent intent = new Intent(context, LocationFragment.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context,
                 OZONE_PENDING_INTENT_ID,
                 intent,

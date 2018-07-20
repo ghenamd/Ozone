@@ -26,9 +26,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.view.LocationActivity"
+            android:name=".ui.view.MainActivity"
             android:hardwareAccelerated="true"
-            android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar" />
 
@@ -48,10 +47,10 @@
 
         <activity
             android:name=".ui.view.dialog.MarkerDialog"
-            android:theme="@style/Theme.AppCompat.Dialog" />
+            android:theme="@style/DialogStyle" />
         <activity
             android:name=".ui.view.dialog.DetailsDialog"
-            android:theme="@style/Theme.AppCompat.Dialog" />
+            android:theme="@style/DialogStyle" />
 
         <receiver android:name=".ui.view.widget.OzoneWidget">
             <intent-filter>
@@ -64,11 +63,7 @@
         </receiver>
 
         <activity android:name=".ui.view.settings.SettingsActivity" />
-        <activity android:name=".ui.view.FavouriteActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.view.MapActivity"
-            android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar" />
+
     </application>
 
 </manifest>

@@ -2,7 +2,6 @@ package com.example.android.ozone.ui.view;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
@@ -18,14 +17,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -36,7 +34,6 @@ import com.example.android.ozone.data.AppDatabase;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.network.AQIntentService;
 import com.example.android.ozone.ui.view.adapter.LocationAdapter;
-import com.example.android.ozone.ui.view.settings.SettingsActivity;
 import com.example.android.ozone.ui.view.widget.OzoneWidgetIntentService;
 import com.example.android.ozone.utils.constants.OzoneConstants;
 import com.example.android.ozone.utils.executors.AppExecutors;
@@ -59,9 +56,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 import static com.example.android.ozone.utils.helper.Helper.REQUEST_CHECK_SETTINGS;
 
-public class LocationActivity extends AppCompatActivity
+public class LocationFragment extends Fragment
         implements SharedPreferences.OnSharedPreferenceChangeListener{
     private AppDatabase mDb;
     private JsonData mData;
@@ -77,26 +76,28 @@ public class LocationActivity extends AppCompatActivity
     RelativeLayout mRelativeLayout;
     private SharedPreferences mPreferences;
 
+    public LocationFragment() {
+    }
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_location);
-        setTitle(getString(R.string.location_activity));
-        ButterKnife.bind(this);
-        BottomNavigationView navigationView = findViewById(R.id.navigation);
-        navigationView.setOnNavigationItemSelectedListener(mBottomNavigationView);
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_location, container, false);
+        ButterKnife.bind(this, view);
+        setRetainInstance(true);
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mPreferences.registerOnSharedPreferenceChangeListener(this);
 
-        mDb = AppDatabase.getInstance(this);
-        mAdapter = new LocationAdapter(new JsonData(), this);
-        if (Helper.isConnected(this)) {
+        mDb = AppDatabase.getInstance(getActivity());
+        mAdapter = new LocationAdapter(new JsonData(), getActivity());
+        if (Helper.isConnected(getActivity())) {
             mProgressBar.setVisibility(View.VISIBLE);
             initPermissions();
         } else {
             informUserConnectionLost();
         }
-        final BottomNavigationView bottom_navigation = this.findViewById(R.id.navigation);
+        //Hide bottomNavigationView
+        final BottomNavigationView bottom_navigation = getActivity().findViewById(R.id.navigation);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -116,48 +117,10 @@ public class LocationActivity extends AppCompatActivity
         });
         setupViewModel();
         //Initialize FirebaseJobDispatcherSync
-        OzoneFireBaseJobDispatcher.initialize(this);
-        OzoneWidgetIntentService.startUpdateOzoneWidget(this.getBaseContext());
+        OzoneFireBaseJobDispatcher.initialize(getActivity());
+        OzoneWidgetIntentService.startUpdateOzoneWidget(getActivity());
 
-    }
-
-    private BottomNavigationView.OnNavigationItemSelectedListener mBottomNavigationView = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.map:
-                    Intent locationIntent = new Intent(LocationActivity.this, MapActivity.class);
-                    startActivity(locationIntent);
-                    break;
-                case R.id.favourite:
-                    Intent favouriteIntent = new Intent(LocationActivity.this, FavouriteActivity.class);
-                    startActivity(favouriteIntent);
-                    break;
-            }
-            return false;
-        }
-    };
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_app_bar, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.app_bar_settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-                return true;
-            default:
-                break;
-        }
-        return false;
+        return view;
     }
 
 //    @Override
@@ -172,14 +135,13 @@ public class LocationActivity extends AppCompatActivity
     @Override
     public void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
 
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         mPreferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
@@ -187,14 +149,14 @@ public class LocationActivity extends AppCompatActivity
     public void onResume() {
         super.onResume();
         IntentFilter filter = new IntentFilter(AQIntentService.ACTION);
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
         mPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
 
     //Request user permission to get the last location
     private void initPermissions() {
-        Dexter.withActivity(this)
+        Dexter.withActivity(getActivity())
                 .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                 .withListener(new PermissionListener() {
                     @Override
@@ -204,7 +166,7 @@ public class LocationActivity extends AppCompatActivity
 
                     @Override
                     public void onPermissionDenied(PermissionDeniedResponse response) {
-                        Toast.makeText(LocationActivity.this, "Permission Deny", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Permission Deny", Toast.LENGTH_SHORT).show();
                         if (response.isPermanentlyDenied()) {
                             // navigate to app settings
                             Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
@@ -224,9 +186,9 @@ public class LocationActivity extends AppCompatActivity
     @SuppressLint("MissingPermission")
     private void getLastLocation() {
         FusedLocationProviderClient fusedLocationClient = LocationServices.
-                getFusedLocationProviderClient(this.getApplicationContext());
+                getFusedLocationProviderClient(getActivity());
         fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
@@ -234,12 +196,12 @@ public class LocationActivity extends AppCompatActivity
                             // Logic to handle location object
                             double lat = location.getLatitude();
                             double lon = location.getLongitude();
-                            Intent AQIntentService = new Intent(LocationActivity.this, AQIntentService.class);
+                            Intent AQIntentService = new Intent(getActivity(), AQIntentService.class);
                             Bundle bundle = new Bundle();
                             bundle.putDouble(OzoneConstants.LAT, lat);
                             bundle.putDouble(OzoneConstants.LON, lon);
                             AQIntentService.putExtra(OzoneConstants.BUNDLE, bundle);
-                            LocationActivity.this.startService(AQIntentService);
+                           getActivity().startService(AQIntentService);
                         }
                     }
                 });
@@ -267,7 +229,6 @@ public class LocationActivity extends AppCompatActivity
     /**
      * If there is no internet connection we can use a ViewModel to retrieve
      * the last location from the database and populate the UI
-     * In case Appdatabase is empty we inform the user that the internet connection is lost
      */
     private void setupViewModel() {
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
@@ -278,9 +239,11 @@ public class LocationActivity extends AppCompatActivity
 
                     fromViewModel = Helper.getLastListItem(jsonData);
                     if (fromViewModel != null) {
-                        Helper.populateUi(fromViewModel, LocationActivity.this,
+                        Helper.populateUi(fromViewModel, getActivity(),
                                 mAdapter, mRecyclerView, mProgressBar);
                     }
+                }else{
+                    getLastLocation();
                 }
             }
         });
@@ -292,27 +255,28 @@ public class LocationActivity extends AppCompatActivity
     private void informUserConnectionLost() {
         noInternet.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.INVISIBLE);
-        Snackbar snackbar = Snackbar.make(LocationActivity.this.findViewById(R.id.snackbar_message),
+        Snackbar snackbar = Snackbar.make(getActivity().findViewById(R.id.snackbar_message),
                 R.string.connection_lost, Snackbar.LENGTH_LONG);
         snackbar.show();
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             // Check for the integer request code originally supplied to startResolutionForResult().
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
-                    case Activity.RESULT_OK:
+                    case RESULT_OK:
                         getLastLocation();
                         break;
-                    case Activity.RESULT_CANCELED:
-                        Helper.settingsRequest(LocationActivity.this);//keep asking
+                    case RESULT_CANCELED:
+                        Helper.settingsRequest(getActivity());//keep asking
                         break;
                 }
                 break;
         }
     }
+
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {

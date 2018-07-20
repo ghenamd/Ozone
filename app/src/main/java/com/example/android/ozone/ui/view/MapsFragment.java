@@ -8,16 +8,15 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
@@ -28,7 +27,6 @@ import android.widget.Toast;
 import com.example.android.ozone.R;
 import com.example.android.ozone.ui.view.adapter.PlaceAutocompleteAdapter;
 import com.example.android.ozone.ui.view.dialog.MarkerDialog;
-import com.example.android.ozone.ui.view.settings.SettingsActivity;
 import com.example.android.ozone.utils.constants.OzoneConstants;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -53,58 +51,54 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
+import static android.content.Context.LOCATION_SERVICE;
+
+public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
     @BindView(R.id.text_search_bar)
     AutoCompleteTextView mCompleteTextView;
     @BindView(R.id.gps_icon)
     ImageView mGpsIcon;
     @BindView(R.id.map_info)
     ImageView mMapInfo;
-    public static final String ADDRESS_KEY = "addresskey";
+    public static final String ADDRESS_KEY = "address_key";
     private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
-    private static final String TAG = "MapActivity";
+    private static final String TAG = "MapsFragment";
     private GoogleMap mMap;
+    private SupportMapFragment mMapFragment;
     private static final float ZOOM = 10f;
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(49.38, -17.39), new LatLng(59.53, 8.96));
     private GoogleApiClient mGoogleApiClient;
     private Marker mMarker;
     private Address mAddress;
+
+    public MapsFragment() {
+    }
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_maps, container, false);
+        ButterKnife.bind(this, view);
+        setRetainInstance(true);
         if (savedInstanceState!=null){
             mAddress = savedInstanceState.getParcelable(ADDRESS_KEY);
         }
-        setContentView(R.layout.activiy_maps);
-        setTitle(getString(R.string.map_activity));
-        ButterKnife.bind(this);
         initGoogleApi();
         initMap();
         showMapInfo();
-        BottomNavigationView navigationView = findViewById(R.id.navigation);
-        navigationView.setOnNavigationItemSelectedListener(mBottomNavigationView);
-
+        return view;
     }
-    private BottomNavigationView.OnNavigationItemSelectedListener mBottomNavigationView = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.current_location:
-                    Intent locationIntent = new Intent(MapActivity.this,LocationActivity.class);
-                    startActivity(locationIntent);
-                    break;
-                case R.id.favourite:
-                    Intent favouriteIntent = new Intent(MapActivity.this,FavouriteActivity.class);
-                    startActivity(favouriteIntent);
-                    break;
-            }
-            return false;
-        }
-    };
+
     private void initMap(){
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(MapActivity.this);
+        mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        if (mMapFragment == null) {
+            FragmentManager fm = getFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            mMapFragment = SupportMapFragment.newInstance();
+            ft.replace(R.id.map, mMapFragment).commit();
+        }
+        mMapFragment.getMapAsync(this);
     }
 
     @SuppressLint("MissingPermission")
@@ -115,32 +109,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         locatePlace();
         initPlaceAutoComplete();
-
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_app_bar, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.app_bar_settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-                return true;
-            default:
-                break;
-        }
-        return false;
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(MapActivity.this,R.string.please_check_your_intenet_connection,Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(),R.string.please_check_your_intenet_connection,Toast.LENGTH_SHORT).show();
     }
 
     private void initPlaceAutoComplete() {
@@ -169,25 +142,25 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     //Hides the keyboard
     private void hideKeyboard() {
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
     private void initGoogleApi() {
         //Initialize GoogleApiClient to create a new PlaceAutoCompleteAdapter
         mGoogleApiClient = new GoogleApiClient
-                .Builder(this)
+                .Builder(getActivity())
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
-                .enableAutoManage(this, this)
+                .enableAutoManage(getActivity(), this)
                 .build();
-        mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(this,
+        mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(getActivity(),
                 mGoogleApiClient, LAT_LNG_BOUNDS, null);
     }
 
     //Method to get the typed string and find the location.
     private void locatePlace() {
         String loc = mCompleteTextView.getText().toString();
-        Geocoder geocoder = new Geocoder(this);
+        Geocoder geocoder = new Geocoder(getActivity());
         List<Address> addressList = new ArrayList<>();
         try {
             addressList = geocoder.getFromLocationName(loc, 1);
@@ -205,7 +178,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMapInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar snackbar = Snackbar.make(findViewById(R.id.snackbar_message), R.string.map_info_message,Snackbar.LENGTH_LONG);
+                Snackbar snackbar = Snackbar.make(getActivity()
+                        .findViewById(R.id.snackbar_message), R.string.map_info_message,Snackbar.LENGTH_LONG);
                 snackbar.show();
             }
         });
@@ -224,7 +198,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Intent intent = new Intent(MapActivity.this, MarkerDialog.class);
+                Intent intent = new Intent(getActivity(), MarkerDialog.class);
                 Bundle bundle =  new Bundle();
                 bundle.putString(OzoneConstants.LOCATION,marker.getTitle());
                 bundle.putDouble(OzoneConstants.LAT_MAP, marker.getPosition().latitude);
@@ -242,7 +216,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onPause() {
         super.onPause();
-        mGoogleApiClient.stopAutoManage(this);
+        mGoogleApiClient.stopAutoManage(getActivity());
         mGoogleApiClient.disconnect();
     }
 
@@ -252,9 +226,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @SuppressLint("MissingPermission")
     private void getDeviceLocation() {
         FusedLocationProviderClient fusedLocationClient = LocationServices.
-                getFusedLocationProviderClient(this.getApplicationContext());
+                getFusedLocationProviderClient(getActivity());
         fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
@@ -270,17 +244,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 });
     }
     public void isGPSEnabled(){
-        LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+        LocationManager service = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
         boolean enabled = service
                 .isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (!enabled) {
-            Toast.makeText(MapActivity.this, R.string.please_enable_gps, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.please_enable_gps, Toast.LENGTH_SHORT).show();
         }
 
     }
     //Save marker position
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         if (mMap !=null){
          outState.putParcelable(ADDRESS_KEY, mAddress);
         }

@@ -64,5 +64,6 @@
     <string name="map_info_message">Click on marker add Location to Favourites</string>
     <string name="please_enable_gps">Please enable your Gps</string>
     <string name="data">data</string>
+    <string name="share_button">Share button</string>
 
 </resources>
