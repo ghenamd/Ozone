@@ -16,7 +16,7 @@ import com.example.android.ozone.ui.view.settings.SettingsActivity;
 import com.example.android.ozone.utils.sync.OzoneFireBaseJobDispatcher;
 
 public class MainActivity extends AppCompatActivity {
-    private ActionBar mActionBar;
+    private ActionBar mActionBar;//2
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
