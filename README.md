@@ -23,16 +23,15 @@ Get health recommendation for a specific air quality index.
 This app provides a widget where the user will be able to view a desired location`s AQI and its weather details.*
 
 
-![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/src/main/res/screnshots/1.png?raw=true) . ![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/src/main/res/screnshots/2.png?raw=true)
+![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/screnshots/1.png?raw=true) . ![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/screnshots/2.png?raw=true)
 
-![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/src/main/res/screnshots/3.png?raw=true) . ![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/src/main/res/screnshots/4.png?raw=true)
+![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/screnshots/3.png?raw=true) . ![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/screnshots/4.png?raw=true)
 
-![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/src/main/res/screnshots/5.png?raw=true) . ![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/src/main/res/screnshots/6.png?raw=true)
+![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/screnshots/5.png?raw=true) . ![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/screnshots/6.png?raw=true)
 
-![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/src/main/res/screnshots/7.png?raw=true) . ![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/src/main/res/screnshots/8.png?raw=true)
+![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/screnshots/7.png?raw=true) . ![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/screnshots/8.png?raw=true)
 
-![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/src/main/res/screnshots/9.png?raw=true)
-
+![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/screnshots/9.png?raw=true)
 
 
 Get an API key from https://airvisual.com/api
