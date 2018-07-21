@@ -70,7 +70,6 @@ public class LocationFragment extends Fragment
         implements SharedPreferences.OnSharedPreferenceChangeListener {
     private AppDatabase mDb;
     private JsonData mData;
-    private JsonData fromViewModel;
     private LocationAdapter mAdapter;
     @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
@@ -211,7 +210,7 @@ public class LocationFragment extends Fragment
                             // Logic to handle location object
                             double lat = location.getLatitude();
                             double lon = location.getLongitude();
-                            Intent AQIntentService = new Intent(getActivity(), AQIntentService.class);
+                            Intent AQIntentService = new Intent(getActivity().getApplicationContext(), AQIntentService.class);
                             Bundle bundle = new Bundle();
                             bundle.putDouble(OzoneConstants.LAT, lat);
                             bundle.putDouble(OzoneConstants.LON, lon);
