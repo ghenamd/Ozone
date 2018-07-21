@@ -5,7 +5,7 @@
 
 Ozone air quality data source: https://www.airvisual.com/
 
-Ozone air quality index basics: https://uk-air.defra.gov.uk/air-pollution/
+Ozone air quality index basics: https://airnow.gov/index.cfm?action=aqibasics.aqi
 
 
 **Intended User**
