@@ -28,7 +28,8 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
     private OnLocationClicked mLocationClicked;
     private int prevPosition = 0;
     private Context mContext;
-    private static final String AQI = "Aqi-";
+    private static final String AQI_US = "Us Aqi-";
+    private static final String AQI_CN = "Cn Aqi-";
 
     public FavouriteAdapter(List<JsonData> dataList, OnLocationClicked clicked, Context context) {
         mData = dataList;
@@ -56,11 +57,11 @@ public class FavouriteAdapter extends RecyclerView.Adapter<FavouriteAdapter.View
         int aqi;
         if (aqiValue.equals("Us")){
             aqi = jsonData.getAqius();
-            holder.mAqi.setText(AQI +String.valueOf(aqi));
+            holder.mAqi.setText(AQI_US +String.valueOf(aqi));
             setViewHolder(aqi,holder);
         }else if (aqiValue.equals("Cn")){
             aqi = jsonData.getAqicn();
-            holder.mAqi.setText(AQI +String.valueOf(aqi));
+            holder.mAqi.setText(AQI_CN +String.valueOf(aqi));
             setViewHolder(aqi,holder);
         }
 

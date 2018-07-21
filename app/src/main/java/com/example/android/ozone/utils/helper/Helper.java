@@ -33,11 +33,11 @@ import java.util.Objects;
 public class Helper {
     public static final int REQUEST_CHECK_SETTINGS = 0x1;
 
-    public static JsonData getLastListItem(List<JsonData> data) {
+    public static JsonData getFirstListItem(List<JsonData> data) {
         int n = data.size();
         if (n != 0) {
-            int i = n - 1;
-            return data.get(i);
+
+            return data.get(0);
         } else {
             return null;
         }

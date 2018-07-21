@@ -8,7 +8,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -58,8 +57,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     AutoCompleteTextView mCompleteTextView;
     @BindView(R.id.gps_icon)
     ImageView mGpsIcon;
-    @BindView(R.id.map_info)
-    ImageView mMapInfo;
     public static final String ADDRESS_KEY = "address_key";
     private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
     private static final String TAG = "MapsFragment";
@@ -80,17 +77,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
         ButterKnife.bind(this, view);
         setRetainInstance(true);
-        if (savedInstanceState!=null){
+        if (savedInstanceState != null) {
             mAddress = savedInstanceState.getParcelable(ADDRESS_KEY);
         }
         initGoogleApi();
         initMap();
-        showMapInfo();
         return view;
     }
 
 
-    private void initMap(){
+    private void initMap() {
         mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mMapFragment == null) {
             FragmentManager fm = getFragmentManager();
@@ -113,7 +109,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(getActivity(),R.string.please_check_your_intenet_connection,Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.please_check_your_intenet_connection, Toast.LENGTH_SHORT).show();
     }
 
     private void initPlaceAutoComplete() {
@@ -174,16 +170,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             moveCameraTo(new LatLng(lat, lon), ZOOM);
         }
     }
-    private void showMapInfo(){
-        mMapInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar snackbar = Snackbar.make(getActivity()
-                        .findViewById(R.id.snackbar_message), R.string.map_info_message,Snackbar.LENGTH_LONG);
-                snackbar.show();
-            }
-        });
-    }
 
     //Moves Camera to the selected location
     private void moveCameraTo(final LatLng latLng, float zoom) {
@@ -199,11 +185,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
             @Override
             public boolean onMarkerClick(Marker marker) {
                 Intent intent = new Intent(getActivity(), MarkerDialog.class);
-                Bundle bundle =  new Bundle();
-                bundle.putString(OzoneConstants.LOCATION,marker.getTitle());
+                Bundle bundle = new Bundle();
+                bundle.putString(OzoneConstants.LOCATION, marker.getTitle());
                 bundle.putDouble(OzoneConstants.LAT_MAP, marker.getPosition().latitude);
-                bundle.putDouble(OzoneConstants.LON_MAP,marker.getPosition().longitude);
-                intent.putExtra(OzoneConstants.BUNDLE_MAP,bundle);
+                bundle.putDouble(OzoneConstants.LON_MAP, marker.getPosition().longitude);
+                intent.putExtra(OzoneConstants.BUNDLE_MAP, bundle);
                 startActivity(intent);
                 return true;
             }
@@ -243,7 +229,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
                     }
                 });
     }
-    public void isGPSEnabled(){
+
+    public void isGPSEnabled() {
         LocationManager service = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
         boolean enabled = service
                 .isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -252,11 +239,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         }
 
     }
+
     //Save marker position
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        if (mMap !=null){
-         outState.putParcelable(ADDRESS_KEY, mAddress);
+        if (mMap != null) {
+            outState.putParcelable(ADDRESS_KEY, mAddress);
         }
         super.onSaveInstanceState(outState);
     }

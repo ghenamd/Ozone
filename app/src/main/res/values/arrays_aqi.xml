@@ -2,7 +2,7 @@
 <resources>
     <array name="pref_aqi_entries">
         <item>Us</item>
-        <item>Cn</item>
+        <item>Chinese</item>
     </array>
 
     <array name="pref_aqi_entry_values">

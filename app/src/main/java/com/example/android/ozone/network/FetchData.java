@@ -43,22 +43,7 @@ public class FetchData {
         }
         return url;
     }
-    public static URL createCityUrl(String city, String state, String country){
-        Uri buildUri = Uri.parse(OzoneConstants.AIR_VISUAL_API_CITY).buildUpon()
-                .appendQueryParameter(OzoneConstants.CITY,city)
-                .appendQueryParameter(OzoneConstants.STATE,state)
-                .appendQueryParameter(OzoneConstants.COUNTRY,country)
-                .appendQueryParameter(OzoneConstants.PARAM_KEY,OzoneConstants.API_KEY)
-                .build();
-        URL url = null;
-        try{
-            url = new URL(buildUri.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            Log.e(TAG, "Error with creating URL ", e);
-        }
-        return url;
-    }
+
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {

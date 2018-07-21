@@ -1,7 +1,6 @@
 package com.example.android.ozone.ui.view;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
@@ -9,14 +8,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Looper;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.preference.PreferenceManager;
@@ -40,9 +42,12 @@ import com.example.android.ozone.utils.executors.AppExecutors;
 import com.example.android.ozone.utils.helper.Helper;
 import com.example.android.ozone.utils.sync.OzoneFireBaseJobDispatcher;
 import com.example.android.ozone.viewModel.MainViewModel;
-import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.SettingsClient;
 import com.karumi.dexter.BuildConfig;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -59,9 +64,10 @@ import butterknife.ButterKnife;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 import static com.example.android.ozone.utils.helper.Helper.REQUEST_CHECK_SETTINGS;
+import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class LocationFragment extends Fragment
-        implements SharedPreferences.OnSharedPreferenceChangeListener{
+        implements SharedPreferences.OnSharedPreferenceChangeListener {
     private AppDatabase mDb;
     private JsonData mData;
     private JsonData fromViewModel;
@@ -75,6 +81,9 @@ public class LocationFragment extends Fragment
     @BindView(R.id.relativeLayout)
     RelativeLayout mRelativeLayout;
     private SharedPreferences mPreferences;
+
+    private long UPDATE_INTERVAL = 10000;  /* 10 secs */
+    private long FASTEST_INTERVAL = 2000; /* 2 sec */
 
     public LocationFragment() {
     }
@@ -105,7 +114,6 @@ public class LocationFragment extends Fragment
                     bottom_navigation.setVisibility(View.GONE);
                 } else if (dy < 0) {
                     bottom_navigation.setVisibility(View.VISIBLE);
-
                 }
             }
 
@@ -121,15 +129,6 @@ public class LocationFragment extends Fragment
         OzoneWidgetIntentService.startUpdateOzoneWidget(getActivity());
         return view;
     }
-
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        if (fromViewModel==null){
-//            Helper.settingsRequest(this);
-//        }
-//
-//    }
 
     @Override
     public void onPause() {
@@ -158,7 +157,7 @@ public class LocationFragment extends Fragment
                 .withListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse response) {
-                        getLastLocation();
+                        startLocationUpdates();
                     }
 
                     @Override
@@ -180,15 +179,34 @@ public class LocationFragment extends Fragment
                 }).check();
     }
 
-    @SuppressLint("MissingPermission")
-    private void getLastLocation() {
-        FusedLocationProviderClient fusedLocationClient = LocationServices.
-                getFusedLocationProviderClient(getActivity());
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+
+    protected void startLocationUpdates() {
+
+        // Create the location request to start receiving updates
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(UPDATE_INTERVAL);
+        locationRequest.setFastestInterval(FASTEST_INTERVAL);
+
+        // Create LocationSettingsRequest object using location request
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(locationRequest);
+        LocationSettingsRequest locationSettingsRequest = builder.build();
+
+        // Check whether location settings are satisfied
+        SettingsClient settingsClient = LocationServices.getSettingsClient(getActivity());
+        settingsClient.checkLocationSettings(locationSettingsRequest);
+
+        // new Google API SDK v11 uses getFusedLocationProviderClient(this)
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+        getFusedLocationProviderClient(getActivity()).requestLocationUpdates(locationRequest, new LocationCallback() {
                     @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
+                    public void onLocationResult(LocationResult locationResult) {
+                        Location location = locationResult.getLastLocation();
                         if (location != null) {
                             // Logic to handle location object
                             double lat = location.getLatitude();
@@ -198,11 +216,13 @@ public class LocationFragment extends Fragment
                             bundle.putDouble(OzoneConstants.LAT, lat);
                             bundle.putDouble(OzoneConstants.LON, lon);
                             AQIntentService.putExtra(OzoneConstants.BUNDLE, bundle);
-                           getActivity().startService(AQIntentService);
+                            getActivity().startService(AQIntentService);
                         }
                     }
-                });
+                },
+                Looper.myLooper());
     }
+
     //A BroadcastReceiver is used to get the JsonData object from the AQIntentService
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -214,8 +234,9 @@ public class LocationFragment extends Fragment
                     AppExecutors.getInstance().diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
-                            if (mData!=null){
-                                mDb.locationDao().insertLocation(mData);}
+                            if (mData != null) {
+                                mDb.locationDao().insertLocation(mData);
+                            }
                         }
                     });
                 }
@@ -234,13 +255,14 @@ public class LocationFragment extends Fragment
             public void onChanged(@Nullable List<JsonData> jsonData) {
                 if ((jsonData != null && jsonData.size() > 0)) {
 
-                    fromViewModel = Helper.getLastListItem(jsonData);
-                    if (fromViewModel != null) {
-                        Helper.populateUi(fromViewModel, getActivity(),
+                    JsonData jd = Helper.getFirstListItem(jsonData);
+                    if (jd != null) {
+                        Helper.populateUi(jd, getActivity(),
                                 mAdapter, mRecyclerView, mProgressBar);
                     }
-                }else{
-                    getLastLocation();
+                } else {
+                    Helper.settingsRequest(getActivity());
+                    startLocationUpdates();
                 }
             }
         });
@@ -264,7 +286,7 @@ public class LocationFragment extends Fragment
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
                     case RESULT_OK:
-                        getLastLocation();
+                        startLocationUpdates();
                         break;
                     case RESULT_CANCELED:
                         Helper.settingsRequest(getActivity());//keep asking
@@ -277,7 +299,7 @@ public class LocationFragment extends Fragment
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.pref_aqi_key))) {
-           setupViewModel();
+            setupViewModel();
         }
     }
 }

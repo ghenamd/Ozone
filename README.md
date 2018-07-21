@@ -5,9 +5,12 @@
 
 Ozone air quality data source: https://www.airvisual.com/
 
+Ozone air quality index basics: https://uk-air.defra.gov.uk/air-pollution/
+
+
 **Intended User**
 
-*Anyone who is concerned about the quality of the air they breathe.*
+*For anyone concerned about the quality of the air they breathe.*
 
 
 **Main features of the app.**
@@ -29,6 +32,12 @@ This app provides a widget where the user will be able to view a desired locatio
 ![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/src/main/res/screnshots/7.png?raw=true) . ![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/src/main/res/screnshots/8.png?raw=true)
 
 ![ozone ](https://github.com/ghenamd/Ozone/blob/master/app/src/main/res/screnshots/9.png?raw=true)
+
+
+
+Get an API key from https://airvisual.com/api
+The key should be inserted in Ozone/app/src/main/java/com/example/android/ozone/utils/constants/OzoneConstants.java under the
+**public static final String API_KEY**
 
 
 
