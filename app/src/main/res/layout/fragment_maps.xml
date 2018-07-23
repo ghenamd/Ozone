@@ -26,14 +26,14 @@
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:src="@drawable/ic_magnify"
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:id="@+id/magnify"
             android:layout_centerVertical="true"
             />
         <AutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_toRightOf="@+id/magnify"
+            android:layout_toEndOf="@+id/magnify"
             android:layout_centerVertical="true"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
