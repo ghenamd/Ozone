@@ -9,7 +9,7 @@ android {
         config {
             keyAlias 'Ozone'
             keyPassword 'password'
-            storeFile file('$rootDir/keystore/keystore.jks')
+            storeFile file('../keystore.jks')
             storePassword 'password'
         }
     }
