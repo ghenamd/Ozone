@@ -97,7 +97,8 @@
                 <ImageView
                     android:id="@+id/weather_condition"
                     style="@style/icon"
-                    android:src="@drawable/d01" />
+                    android:src="@drawable/d01"
+                    android:contentDescription="@string/weather_condition" />
 
                 <TextView
                     android:id="@+id/temperature"
@@ -112,7 +113,8 @@
                     android:id="@+id/humidity"
                     style="@style/icon"
                     android:src="@drawable/humid_icon"
-                    android:tint="@color/gray" />
+                    android:tint="@color/gray"
+                    android:contentDescription="@string/humidity_level" />
 
                 <TextView
                     android:id="@+id/humidity_percentage"
@@ -127,7 +129,8 @@
                     android:id="@+id/wind"
                     style="@style/icon"
                     android:src="@drawable/wind_icon"
-                    android:tint="@color/gray" />
+                    android:tint="@color/gray"
+                    android:contentDescription="@string/wind_speed" />
 
                 <TextView
                     android:id="@+id/wind_speed"

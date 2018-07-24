@@ -65,5 +65,17 @@
     <string name="please_enable_gps">Please enable your Gps</string>
     <string name="data">data</string>
     <string name="share_button">Share button</string>
+    <string name="temp">Temp:</string>
+    <string name="added">added</string>
+    <string name="error_contacting_api">Error contacting API: No internet connection</string>
+    <string name="start_autocomplete_query">Starting autocomplete query for:</string>
+    <string name="error_getting_autocomplete_prediction">Error getting autocomplete prediction API call:</string>
+    <string name="query_completed">Query completed. Received</string>
+    <string name="not_connected_for_autocomplete">Google API client is not connected for autocomplete query.</string>
+    <string name="search_bar">Search bar</string>
+    <string name="add_to_favourite">Add to favourite</string>
+    <string name="weather_condition">Weather condition</string>
+    <string name="humidity_level">Humidity level</string>
+    <string name="wind_speed">Wind speed</string>
 
 </resources>

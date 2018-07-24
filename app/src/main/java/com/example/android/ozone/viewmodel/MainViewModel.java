@@ -1,4 +1,4 @@
-package com.example.android.ozone.viewModel;
+package com.example.android.ozone.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;

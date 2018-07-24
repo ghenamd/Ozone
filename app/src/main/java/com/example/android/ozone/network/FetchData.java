@@ -21,11 +21,24 @@ import java.util.Scanner;
 public class FetchData {
 
     private static final String TAG = "FetchData";
-
-
-    public FetchData() {
-    }
-
+    private static final String DATA = "data";
+    private static final String CITY = "city";
+    private static final String STATE = "state";
+    private static final String COUNTRY = "country";
+    private static final String CURRENT = "current";
+    private static final String WEATHER = "weather";
+    private static final String TS = "ts";
+    private static final String HU = "hu";
+    private static final String IC = "ic";
+    private static final String PR = "pr";
+    private static final String TP = "tp";
+    private static final String WD = "wd";
+    private static final String WS = "ws";
+    private static final String POLLUTION = "pollution";
+    private static final String AQIUS = "aqius";
+    private static final String AQICN = "aqicn";
+    private static final String LOCATION = "location";
+    private static final String COORDINATES = "coordinates";
 
     public static URL createUrl(String lat,String lon){
         Uri buildUri = Uri.parse(OzoneConstants.AIR_VISUAL_API).buildUpon()
@@ -70,30 +83,29 @@ public class FetchData {
         JsonData jsonData= null;
         try{
             JSONObject baseJsonResponse = new JSONObject(json);
-            JSONObject responseObject = baseJsonResponse.getJSONObject("data");
-            String city = responseObject.getString("city");
-            String state = responseObject.getString("state");
-            String country = responseObject.getString("country");
-            JSONObject currentObject = responseObject.getJSONObject("current");
-            JSONObject weatherObject = currentObject.getJSONObject("weather");
-            String ts = weatherObject.getString("ts");
-            int hu = weatherObject.getInt("hu");
-            String ic = weatherObject.getString("ic");
-            int pr = weatherObject.getInt("pr");
-            int tp = weatherObject.getInt("tp");
-            int wd = weatherObject.getInt("wd");
-            double ws = weatherObject.getDouble("ws");
-            JSONObject pollutionObject = currentObject.getJSONObject("pollution");
-            int aqius = pollutionObject.getInt("aqius");
-            int aqicn = pollutionObject.getInt("aqicn");
-            JSONObject currentLocation = responseObject.getJSONObject("location");
-            JSONArray coordinates = currentLocation.getJSONArray("coordinates");
+            JSONObject responseObject = baseJsonResponse.getJSONObject(DATA);
+            String city = responseObject.getString(CITY);
+            String state = responseObject.getString(STATE);
+            String country = responseObject.getString(COUNTRY);
+            JSONObject currentObject = responseObject.getJSONObject(CURRENT);
+            JSONObject weatherObject = currentObject.getJSONObject(WEATHER);
+            String ts = weatherObject.getString(TS);
+            int hu = weatherObject.getInt(HU);
+            String ic = weatherObject.getString(IC);
+            int pr = weatherObject.getInt(PR);
+            int tp = weatherObject.getInt(TP);
+            int wd = weatherObject.getInt(WD);
+            double ws = weatherObject.getDouble(WS);
+            JSONObject pollutionObject = currentObject.getJSONObject(POLLUTION);
+            int aqius = pollutionObject.getInt(AQIUS);
+            int aqicn = pollutionObject.getInt(AQICN);
+            JSONObject currentLocation = responseObject.getJSONObject(LOCATION);
+            JSONArray coordinates = currentLocation.getJSONArray(COORDINATES);
             double lon = coordinates.getDouble(0);
             double lat = coordinates.getDouble(1);
             jsonData = new JsonData(city,state,country,ts,hu,ic,pr,tp,wd,ws,aqius,aqicn,lat,lon);
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(TAG, "Problem parsing the location JSON results", e);
         }
         return jsonData;
     }

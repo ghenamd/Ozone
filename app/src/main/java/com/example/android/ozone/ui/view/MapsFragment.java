@@ -68,10 +68,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     private Marker mMarker;
     private Address mAddress;
 
-    public MapsFragment() {
-    }
-
-    @Override
+       @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
@@ -100,6 +97,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
+           Toast.makeText(getActivity(),"Map is ready",Toast.LENGTH_SHORT).show();
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);

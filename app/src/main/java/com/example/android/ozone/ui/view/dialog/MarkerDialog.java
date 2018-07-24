@@ -18,8 +18,8 @@ import com.example.android.ozone.network.FetchData;
 import com.example.android.ozone.utils.executors.AppExecutors;
 import com.example.android.ozone.utils.helper.Helper;
 import com.example.android.ozone.utils.constants.OzoneConstants;
-import com.example.android.ozone.viewModel.QueryByNameViewModel;
-import com.example.android.ozone.viewModel.QueryByNameViewModelFactory;
+import com.example.android.ozone.viewmodel.QueryByNameViewModel;
+import com.example.android.ozone.viewmodel.QueryByNameViewModelFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -89,7 +89,7 @@ public class MarkerDialog extends AppCompatActivity {
                 mDialogAqi.setText(getString(R.string.aqi) + data.getAqius());
                 mButton.setVisibility(View.VISIBLE);
                 StringBuilder builder = new StringBuilder();
-                builder.append("Temp: ").append(String.valueOf(data.getTp())).append("C");
+                builder.append(getString(R.string.temp)).append(String.valueOf(data.getTp())).append("C");
                 mDialogTemperature.setText(builder);
             } else {
                 errorText.setText(R.string.aqi_data_unavailable);

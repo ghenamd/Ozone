@@ -15,8 +15,6 @@ import java.net.URL;
 
 public class AQIntentService extends JobIntentService {
    //We use JobIntentService to target Android SDK 26 and up
-
-    private static final String TAG = "AQIntentService";
     public static final String ACTION = "Action";
     public AQIntentService() {
         super();

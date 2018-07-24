@@ -41,7 +41,7 @@ import com.example.android.ozone.utils.constants.OzoneConstants;
 import com.example.android.ozone.utils.executors.AppExecutors;
 import com.example.android.ozone.utils.helper.Helper;
 import com.example.android.ozone.utils.sync.OzoneFireBaseJobDispatcher;
-import com.example.android.ozone.viewModel.MainViewModel;
+import com.example.android.ozone.viewmodel.MainViewModel;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -84,10 +84,7 @@ public class LocationFragment extends Fragment
     private long UPDATE_INTERVAL = 10000;  /* 10 secs */
     private long FASTEST_INTERVAL = 2000; /* 2 sec */
 
-    public LocationFragment() {
-    }
-
-    @Override
+       @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_location, container, false);

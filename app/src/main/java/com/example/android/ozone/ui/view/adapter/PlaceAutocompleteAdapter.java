@@ -16,6 +16,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.ozone.R;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
@@ -182,7 +183,7 @@ public class PlaceAutocompleteAdapter
      */
     private ArrayList<AutocompletePrediction> getAutocomplete(CharSequence constraint) {
         if (mGoogleApiClient.isConnected()) {
-            Log.i(TAG, "Starting autocomplete query for: " + constraint);
+            Log.i(TAG, R.string.start_autocomplete_query + String.valueOf(constraint));
 
             // Submit the query to the autocomplete API and retrieve a PendingResult that will
             // contain the results when the query completes.
@@ -199,20 +200,20 @@ public class PlaceAutocompleteAdapter
             // Confirm that the query completed successfully, otherwise return null
             final Status status = autocompletePredictions.getStatus();
             if (!status.isSuccess()) {
-                Toast.makeText(getContext(), "Error contacting API: No internet connection " ,
+                Toast.makeText(getContext(), R.string.error_contacting_api ,
                         Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Error getting autocomplete prediction API call: " + status.toString());
+                Log.e(TAG, R.string.error_getting_autocomplete_prediction + status.toString());
                 autocompletePredictions.release();
                 return null;
             }
 
-            Log.i(TAG, "Query completed. Received " + autocompletePredictions.getCount()
+            Log.i(TAG,R.string.query_completed + autocompletePredictions.getCount()
                     + " predictions.");
 
             // Freeze the results immutable representation that can be stored safely.
             return DataBufferUtils.freezeAndClose(autocompletePredictions);
         }
-        Log.e(TAG, "Google API client is not connected for autocomplete query.");
+        Log.e(TAG, String.valueOf(R.string.not_connected_for_autocomplete));
         return null;
     }
 

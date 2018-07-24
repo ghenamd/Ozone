@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.android.ozone.R;
 import com.example.android.ozone.model.JsonData;
 import com.example.android.ozone.ui.view.adapter.LocationAdapter;
 import com.google.android.gms.common.api.ApiException;
@@ -32,6 +33,7 @@ import java.util.Objects;
 
 public class Helper {
     public static final int REQUEST_CHECK_SETTINGS = 0x1;
+    public static final String DELETED = " deleted";
 
     public static JsonData getFirstListItem(List<JsonData> data) {
         int n = data.size();
@@ -63,16 +65,16 @@ public class Helper {
     }
 
     public static void showToastInserted(Context context, String city) {
-        Toast.makeText(context, city + " added", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, city + context.getString(R.string.added), Toast.LENGTH_SHORT).show();
     }
 
     public static void showToastDeleted(Context context, String city) {
-        Toast.makeText(context, city + " deleted", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, city + DELETED, Toast.LENGTH_SHORT).show();
     }
 
     public static void enableGpsDialog(final Context context) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Please enable your Gps");
+        builder.setTitle(R.string.please_enable_gps);
         builder.setPositiveButton("OK",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface d, int id) {

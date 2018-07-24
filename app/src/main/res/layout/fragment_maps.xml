@@ -29,7 +29,7 @@
             android:layout_marginStart="8dp"
             android:id="@+id/magnify"
             android:layout_centerVertical="true"
-            />
+            android:contentDescription="@string/search_bar" />
         <AutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"

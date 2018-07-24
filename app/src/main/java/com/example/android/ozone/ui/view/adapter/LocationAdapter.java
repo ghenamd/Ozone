@@ -23,10 +23,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder>  {
-    private static final String TAG = "LocationAdapter";
+
     private JsonData mData;
     private Context mContext;
-    private LocationAdapter.ViewHolder holder;
 
     public LocationAdapter(JsonData data, Context context) {
         mData = data;
@@ -44,7 +43,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull LocationAdapter.ViewHolder hold, int position) {
-        holder = hold;
+        ViewHolder holder = hold;
         holder.city.setText(mData.getCity());
         holder.country.setText(mData.getState() + ", " + mData.getCountry());
         holder.humidityPercentage.setText(String.valueOf(mData.getHu() + "%"));

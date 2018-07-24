@@ -26,7 +26,7 @@ import com.example.android.ozone.ui.view.widget.OzoneWidgetIntentService;
 import com.example.android.ozone.utils.constants.OzoneConstants;
 import com.example.android.ozone.utils.executors.AppExecutors;
 import com.example.android.ozone.utils.helper.Helper;
-import com.example.android.ozone.viewModel.MainViewModel;
+import com.example.android.ozone.viewmodel.MainViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
