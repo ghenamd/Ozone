@@ -39,8 +39,6 @@ The key should be inserted in Ozone/app/src/main/java/com/example/android/ozone/
 **public static final String API_KEY**
 
 ### Project Overview
-In the Capstone project, you will build an app of your own design in two stages. 
-
 Creating and building your own app idea can be both exciting and daunting; ultimately, we want the experience to be rewarding. You'll apply a wealth of different concepts and components that you've learned across the Nanodegree to bring you own app idea to life.
 
 ### Why this Project?
