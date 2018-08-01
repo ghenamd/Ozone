@@ -38,5 +38,15 @@ Get an API key from https://airvisual.com/api
 The key should be inserted in Ozone/app/src/main/java/com/example/android/ozone/utils/constants/OzoneConstants.java under the
 **public static final String API_KEY**
 
+#### Project Overview
+Creating and building your own app idea can be both exciting and daunting; ultimately, we want the experience to be rewarding. You'll apply a wealth of different concepts and components that you've learned across the Nanodegree to bring you own app idea to life.
 
+#### Why this Project?
+To become a proficient Android Developer, you need to design apps and make plans for how to implement them. This will involve choices such as how you will store data, how you will display data to the user, and what functionality to include in the app.
+
+#### What Will I Learn?
+Through this project, you'll demonstrate the ability to communicate an app idea formally, using:
+* An app description
+* UI flow mocks
+* A list of required tasks that you will complete to build the app
 
