@@ -37,7 +37,7 @@ public class HelperTest {
     }
 
     @Test
-    public void checkIfNull(){
+    public void checkIfGetsFirstItemInTheList(){
         List list = Mockito.spy(new ArrayList());
         list.add(mData);
         list.add(mJsonData);
