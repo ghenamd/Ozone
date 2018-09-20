@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 
-public class OzoneJobDispatcher extends JobService {
+public class OzoneJobService extends JobService {
 
     private AsyncTask mBackgroundTask;
     //Start the job to update the data in the database

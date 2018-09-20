@@ -45,6 +45,7 @@ public class OzoneSyncTask {
         //After data has been updated show user a notification
         //This has been implemented only for practicing purpose
         NotificationUtils.showNotificationAfterUpdate(context);
+
     }
 
 

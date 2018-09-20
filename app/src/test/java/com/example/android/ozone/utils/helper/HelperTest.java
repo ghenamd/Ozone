@@ -19,8 +19,10 @@ import static org.mockito.Mockito.when;
 public class HelperTest {
 
     @Mock
+    private
     JsonData mData;
     @Mock
+    private
     JsonData mJsonData;
 
 

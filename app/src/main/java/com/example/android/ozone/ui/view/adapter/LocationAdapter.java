@@ -31,7 +31,6 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
         mData = data;
         mContext = context;
 
-
     }
 
     @NonNull
@@ -53,8 +52,8 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
         setAqiValue(mData, hold);
         setWeatherConditionLogo(mData,hold);
 
-
     }
+
     //Helper method to change textViews content depending on Aqi value
     private void setAqiValue(JsonData jsonData, LocationAdapter.ViewHolder holder) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -115,6 +114,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
             }
         }
     }
+
     //Helper method to change weatherLogo depending on server reply
     private void setWeatherConditionLogo(JsonData jsonData, LocationAdapter.ViewHolder holder){
         String weatherCondLogo = jsonData.getIc();

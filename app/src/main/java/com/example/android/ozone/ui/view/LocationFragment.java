@@ -125,6 +125,12 @@ public class LocationFragment extends Fragment
         OzoneWidgetIntentService.startUpdateOzoneWidget(getActivity());
         return view;
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(AQIntentService.ACTION);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
+    }
 
     @Override
     public void onPause() {
@@ -137,13 +143,6 @@ public class LocationFragment extends Fragment
     public void onDestroyView() {
         super.onDestroyView();
         mPreferences.unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        IntentFilter filter = new IntentFilter(AQIntentService.ACTION);
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
     }
 
     //Request user permission to get the last location

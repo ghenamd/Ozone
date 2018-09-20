@@ -47,6 +47,7 @@ public class NotificationUtils {
 
         notificationManager.notify(OZONE_NOTIFICATION_ID, notificationBuilder.build());
 
+
     }
 
     private static PendingIntent contentIntent(Context context) {
