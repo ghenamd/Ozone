@@ -50,13 +50,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             }
         }
     }
-    @Override
-    public void onStop() {
-        super.onStop();
-        // unregister the preference change listener
-        getPreferenceScreen().getSharedPreferences()
-                .unregisterOnSharedPreferenceChangeListener(this);
-    }
+
 
     @Override
     public void onStart() {
@@ -64,5 +58,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         // register the preference change listener
         getPreferenceScreen().getSharedPreferences()
                 .registerOnSharedPreferenceChangeListener(this);
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        // unregister the preference change listener
+        getPreferenceScreen().getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(this);
     }
 }

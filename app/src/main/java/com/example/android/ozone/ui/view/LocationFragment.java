@@ -133,17 +133,13 @@ public class LocationFragment extends Fragment
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
+        super.onStop();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
-
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
         mPreferences.unregisterOnSharedPreferenceChangeListener(this);
+
     }
+
 
     //Request user permission to get the last location
     private void initPermissions() {
